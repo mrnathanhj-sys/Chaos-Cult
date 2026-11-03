@@ -1,5 +1,5 @@
 // Offline cache for Skin and Sinew. Bump VERSION when you change any file.
-const VERSION = 'eightfold-path-v20';
+const VERSION = 'eightfold-path-v21';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -12,6 +12,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  // Leave audio alone: Safari needs real range responses to play media, which a cached copy can't give
+  if (req.destination === 'audio' || req.headers.has('range') || /\.(mp3|ogg|wav)$/i.test(url.pathname)) return;
   // App pages: network first so updates arrive, cache when offline
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const c = r.clone(); caches.open(VERSION).then(x => x.put('index.html', c)); return r; }).catch(() => caches.match('index.html')));
