@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f1512">
+<meta name="description" content="Chaos Cult gang builder, battle tracker and searchable rules for Necromunda.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Eightfold Path">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Eightfold Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky header with three route tabs; builder = settings rail + fighter cards; play = tracker strip, articles, fighter cards; rules = searchable codex */
+:root{
+  --bg:#e8e4e1; --surface:#f6f3f1; --sunk:#ddd7d2; --line:#c9bfb8; --fg:#24140f; --muted:#6c5a51;
+  --blood:#9b1c14;  --brass:#86651f; --brass-soft:#86651f22;
+  --ok:#2f6b3a; --warn:#9a5b06; --err:#a3170f;
+  --display:"Pirata One","UnifrakturCook",Georgia,serif;
+  --body:"Alegreya Sans","Gill Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px; --on-blood:#fff;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#150e0c; --surface:#1f1512; --sunk:#2a1d18; --line:#3d2b24; --fg:#ece2d4; --muted:#a8968a;
+  --blood:#d6443a;  --brass:#cfa85c; --brass-soft:#cfa85c22;
+  --ok:#6cbf7a; --warn:#e2a54a; --err:#ee6157; --on-blood:#140d0b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#150e0c; --surface:#1f1512; --sunk:#2a1d18; --line:#3d2b24; --fg:#ece2d4; --muted:#a8968a;
+  --blood:#d6443a;  --brass:#cfa85c; --brass-soft:#cfa85c22;
+  --ok:#6cbf7a; --warn:#e2a54a; --err:#ee6157; --on-blood:#140d0b; color-scheme:dark}
+:root{--blood-soft:color-mix(in srgb,var(--blood) 13%,transparent)}
+:root[data-ded="nurgle"]{--blood:#4d6a12;--bg:#e3e6d6;--surface:#f2f4ea;--sunk:#d6dbc4;--line:#bfc6a6;--muted:#5b6247;}:root[data-ded="tzeentch"]{--blood:#1f4fa3;--bg:#dfe4ee;--surface:#f1f4f9;--sunk:#d0d8e7;--line:#b6c2d8;--muted:#4f5b72;}:root[data-ded="slaanesh"]{--blood:#9a2a87;--bg:#ebe0ea;--surface:#f7f1f6;--sunk:#dfd0dd;--line:#cbb5c8;--muted:#6b5568;}:root[data-ded="undivided"]{--blood:#4b4a57;--bg:#e2e1e6;--surface:#f3f3f5;--sunk:#d5d4db;--line:#bdbbc6;--muted:#5b5a66;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-ded="nurgle"]{--blood:#9cc24b;--bg:#0f130b;--surface:#171c10;--sunk:#212817;--line:#323c22;--muted:#a3ab8e;--fg:#e4e8d6;}:root:not([data-theme="light"])[data-ded="tzeentch"]{--blood:#6aa0ee;--bg:#0b0f19;--surface:#121827;--sunk:#1a2234;--line:#2a354d;--muted:#97a3bd;--fg:#dfe6f3;}:root:not([data-theme="light"])[data-ded="slaanesh"]{--blood:#dc6ac8;--bg:#150b14;--surface:#1f121d;--sunk:#2a1827;--line:#3e2539;--muted:#b495ae;--fg:#f0e1ec;}:root:not([data-theme="light"])[data-ded="undivided"]{--blood:#bdb3c9;--bg:#101014;--surface:#18181e;--sunk:#22222a;--line:#33333e;--muted:#a3a2ae;--fg:#e6e5ec;}}
+:root[data-theme="dark"][data-ded="nurgle"]{--blood:#9cc24b;--bg:#0f130b;--surface:#171c10;--sunk:#212817;--line:#323c22;--muted:#a3ab8e;--fg:#e4e8d6;}:root[data-theme="dark"][data-ded="tzeentch"]{--blood:#6aa0ee;--bg:#0b0f19;--surface:#121827;--sunk:#1a2234;--line:#2a354d;--muted:#97a3bd;--fg:#dfe6f3;}:root[data-theme="dark"][data-ded="slaanesh"]{--blood:#dc6ac8;--bg:#150b14;--surface:#1f121d;--sunk:#2a1827;--line:#3e2539;--muted:#b495ae;--fg:#f0e1ec;}:root[data-theme="dark"][data-ded="undivided"]{--blood:#bdb3c9;--bg:#101014;--surface:#18181e;--sunk:#22222a;--line:#33333e;--muted:#a3a2ae;--fg:#e6e5ec;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);transition:background .3s,color .3s;font-family:var(--body);font-size:16px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.01em}
+h2{font-size:1.9rem;line-height:1.1}
+h3{font-size:1.35rem}
+p{margin:0}
+a{color:var(--blood)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);transition:background .3s;border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;min-width:0}
+.brand h1{font-size:2rem;line-height:1;color:var(--blood)}
+.brand small{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs a{padding:6px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:700;font-size:.92rem}
+.tabs a[aria-current="page"]{background:var(--blood);color:var(--on-blood)}
+main{padding-block:20px 60px}
+
+/* generic */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stack{display:flex;flex-direction:column;gap:12px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:7px 12px;cursor:pointer;font-weight:700;font-size:.9rem;line-height:1.2}
+.btn:hover{border-color:var(--brass)}
+.btn.primary{background:var(--blood);border-color:var(--blood);color:var(--on-blood)}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 9px;font-size:.82rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.danger{color:var(--err);border-color:var(--err)}
+input[type=text],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;min-width:0;max-width:100%}
+textarea{width:100%;font-family:var(--mono);font-size:.78rem}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.92rem}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:700;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.brass{background:var(--brass-soft);color:var(--brass)}
+.pill.blood{background:var(--blood-soft);color:var(--blood)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* builder layout */
+.builder{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);display:flex;flex-direction:column;gap:14px}
+@media (max-width:860px){.builder{grid-template-columns:minmax(0,1fr)}.rail{position:static}}
+.budget{height:8px;background:var(--sunk);border-radius:999px;overflow:hidden}
+.budget i{display:block;height:100%;background:var(--brass)}
+.budget.over i{background:var(--err)}
+.big{font-family:var(--mono);font-size:1.6rem;font-weight:600;font-variant-numeric:tabular-nums}
+.issues{display:flex;flex-direction:column;gap:6px;font-size:.9rem;margin:0;padding:0;list-style:none}
+.issues li{display:flex;gap:8px;align-items:flex-start}
+.issues li::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;margin-top:7px;background:var(--ok)}
+.issues li.err::before{background:var(--err)}
+.issues li.warn::before{background:var(--warn)}
+.addgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+.addgrid button{text-align:left;display:flex;flex-direction:column;gap:1px;padding:8px 10px}
+.addgrid button span{font-size:.76rem;color:var(--muted);font-weight:500}
+
+/* fighter cards */
+.cards{display:flex;flex-direction:column;gap:12px}
+.fc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.fc.leader{border-color:var(--brass)}
+.fch{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:linear-gradient(90deg,var(--blood-soft),transparent 70%)}
+.fch .nm{font-family:var(--display);font-size:1.45rem;line-height:1.05;min-width:0;overflow-wrap:anywhere}
+.fch .ty{font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.fch .cost{margin-left:auto;font-family:var(--mono);font-weight:600;white-space:nowrap}
+.fch .chev{color:var(--muted);transition:transform .15s}
+.fc.open .fch .chev{transform:rotate(90deg)}
+.fcb{padding:4px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.scroll{overflow-x:auto;max-width:100%}
+.stats{border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.85rem;min-width:100%}
+.stats th{font-size:.66rem;color:var(--muted);font-weight:600;padding:2px 4px;text-align:center;border-bottom:1px solid var(--line)}
+.stats td{text-align:center;padding:4px;font-weight:600}
+.stats td.mod{color:var(--blood)}
+.stats td.hurt{color:var(--err);text-decoration:underline}
+.wtab{border-collapse:collapse;font-size:.8rem;width:100%}
+.wtab th{font-size:.66rem;color:var(--muted);text-align:left;padding:3px 5px;border-bottom:1px solid var(--line);font-weight:700;white-space:nowrap}
+.wtab td{padding:4px 5px;border-bottom:1px solid var(--sunk);vertical-align:top}
+.wtab td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+.wtab td:first-child{font-weight:700;white-space:nowrap}
+.wtab td.tr{min-width:160px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 4px 3px 10px;font-size:.85rem}
+.chip b{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--muted)}
+.chip button{border:0;background:transparent;cursor:pointer;color:var(--muted);width:22px;height:22px;border-radius:50%;font-size:1rem;line-height:1}
+.chip button:hover{background:var(--blood-soft);color:var(--blood)}
+.sub{display:flex;flex-direction:column;gap:6px}
+.rd{border:1px solid var(--line);border-radius:var(--r);background:var(--bg)}
+.rd summary{cursor:pointer;padding:5px 10px;font-weight:700;font-size:.88rem;list-style:none}
+.rd summary::-webkit-details-marker{display:none}
+.rd summary::before{content:"+ ";color:var(--brass)}
+.rd[open] summary::before{content:"– "}
+.rd p,.rd div.t{padding:0 10px 8px;font-size:.9rem}
+.rules-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;align-items:start}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.confirm{display:inline-flex;gap:6px;align-items:center;font-size:.88rem}
+
+/* play */
+.seg{display:inline-flex;gap:4px;background:var(--sunk);padding:4px;border-radius:var(--r);flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:4px;font-weight:700;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 0 var(--line)}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.counter{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.counter .big{min-width:2ch;text-align:center}
+.step{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:800;font-size:1.1rem}
+.step:hover{border-color:var(--brass)}
+.pool{font-family:var(--display);font-size:3rem;line-height:.9;color:var(--blood)}
+.dice{display:flex;flex-wrap:wrap;gap:5px}
+.die{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-family:var(--mono);font-weight:600;border:1px solid var(--line);background:var(--bg)}
+.die.hit{background:var(--blood);border-color:var(--blood);color:var(--on-blood)}
+.result{border-left:3px solid var(--brass);padding:8px 12px;background:var(--brass-soft);border-radius:0 var(--r) var(--r) 0;display:flex;flex-direction:column;gap:6px}
+.result.fail{border-color:var(--err);background:var(--blood-soft)}
+.result.pass{border-color:var(--ok)}
+.arts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.art{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:5px}
+.art.used{opacity:.5}
+.art h4{margin:0;font-family:var(--body);font-weight:800;font-size:.95rem;font-style:italic}
+.art .thr{font-family:var(--mono);font-weight:600;color:var(--blood)}
+.art p{font-size:.86rem}
+.art .f{color:var(--muted)}
+.tk{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.tc{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tc.st-pinned{border-left:4px solid var(--warn)}
+.tc.st-si{border-left:4px solid var(--err)}
+.tc.st-broken{border-left:4px solid var(--warn)}
+.tc.st-ooa{opacity:.55;border-left:4px solid var(--muted)}
+.tc.st-out{opacity:.4}
+.tc .hd{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.tc .hd strong{font-family:var(--display);font-size:1.3rem;font-weight:400}
+.fw{display:inline-flex;align-items:center;gap:6px}
+.card-back{border:1px dashed var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.suit{font-family:var(--display);font-size:1.6rem;line-height:1;color:var(--blood)}
+
+/* rules codex */
+.codex{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);display:flex;flex-direction:column;gap:2px;font-size:.92rem}
+.toc a{color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:4px}
+.toc a:hover{background:var(--sunk);color:var(--fg)}
+@media (max-width:860px){.codex{grid-template-columns:minmax(0,1fr)}.toc{position:static;flex-direction:row;flex-wrap:wrap}}
+.csec{display:flex;flex-direction:column;gap:12px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:28px;scroll-margin-top:90px}
+.rb{display:flex;flex-direction:column;gap:6px;max-width:78ch}
+.rb.wide{max-width:none}
+.rb h3{color:var(--blood)}
+.rb ul,.rb ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.dt{border-collapse:collapse;font-size:.86rem;width:100%}
+.dt th{text-align:left;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:5px 7px;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt td{padding:5px 7px;border-bottom:1px solid var(--sunk);vertical-align:top}
+.dt td.c{text-align:center;font-family:var(--mono)}
+.dt tr.grp td{font-weight:800;color:var(--brass);background:var(--sunk);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+.tick{color:var(--blood);font-weight:800}
+.search{width:100%;font-size:1rem;padding:10px 12px}
+.hidden-by-search{display:none!important}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:700;z-index:50;font-size:.9rem}
+@keyframes quake{0%,100%{transform:none}20%{transform:translate(-3px,1px) rotate(-2deg)}40%{transform:translate(3px,-1px) rotate(2deg)}60%{transform:translate(-2px,0) rotate(-1deg)}80%{transform:translate(2px,1px) rotate(1deg)}}
+.brand h1{cursor:default;user-select:none}.brand h1.quake,.recruit.quake{animation:quake .3s 3}
+.fc.dead{opacity:.55}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:stretch}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pc.off{opacity:.6}
+.pch{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pch h3{font-size:1.3rem}
+.pickbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);z-index:5;display:flex;flex-direction:column;gap:8px}
+@media (max-width:600px){.pickbar{position:static}}
+.rtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.rtile{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);text-decoration:none;color:var(--fg)}
+.rtile strong{font-family:var(--display);font-weight:400;font-size:1.45rem;color:var(--blood)}
+.rtile span{color:var(--muted);font-size:.9rem}
+.rtile:hover{border-color:var(--blood)}
+.toc a[aria-current="page"]{background:var(--blood-soft);color:var(--blood);font-weight:700}
+.crumbs{font-size:.88rem;color:var(--muted)}.crumbs a{color:var(--muted)}
+a.btn{text-decoration:none;color:var(--fg);display:inline-block}
+.cog{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer;transition:transform .3s}
+.cog:hover,.cog.on{color:var(--blood);border-color:var(--blood)}.cog.on{transform:rotate(60deg)}
+.artsbox>summary{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:1rem;padding:10px 12px}
+.artlist{display:flex;flex-direction:column;gap:4px}
+.artrow{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.artrow summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:7px 10px;font-size:.9rem}
+.artrow summary::-webkit-details-marker{display:none}
+.artrow .thr{font-family:var(--mono);font-weight:600;color:var(--blood);min-width:3ch}
+.artrow .an{flex:1;min-width:0;font-weight:700;font-style:italic}
+.artrow p{padding:0 10px 8px;font-size:.86rem}.artrow p.f{color:var(--muted)}
+.artrow.used{opacity:.55}
+.artref td{vertical-align:top}.artref .thr{font-family:var(--mono);font-weight:600;color:var(--blood)}.artref td:nth-child(2){min-width:140px;font-style:italic}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>Eightfold Path</h1><small>Chaos Cult</small></div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#build" data-route="build">Gang</a>
+      <a href="#play" data-route="play">Play</a>
+      <a href="#rules" data-route="rules">Rules</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ============================== DATA ============================== */
+const STATK=['M','WS','BS','S','T','W','I','A','Ld','Cl','WP','Int'];
+const TN=new Set(['WS','BS','I','Ld','Cl','WP','Int']);
+
+const FT={
+apostle:{n:'Apostle',role:'Leader',cost:90,max:1,code:'A',st:[5,3,3,3,3,2,4,3,6,6,6,7],mark:1,hier:1,mut:[0,1],free:1,P:['Brawn','Combat','Ferocity','Savagery'],S:['Leadership','Heresy','Mutation'],rules:['Gang Leader','Gang Hierarchy (Leader)','Group Activation (2)','The Eightfold Path','Devotion','Amaranthine'],equip:'Can use any weapon. Buys from the Apostle list, Trading Post or Black Market.'},
+disciple:{n:'Disciple',role:'Champion',cost:60,max:99,code:'D',st:[5,4,4,3,3,2,4,2,7,6,8,8],mark:1,hier:1,champ:1,mut:[0,1],free:1,P:['Brawn','Combat','Ferocity'],S:['Savagery','Heresy','Mutation'],rules:['Gang Hierarchy (Champion)','Group Activation (1)','Deranged Zeal'],equip:'Can use any weapon. Buys from the Disciple list, Trading Post or Black Market.'},
+sorcerer:{n:'Sorcerer',role:'Champion',cost:75,max:2,code:'S',st:[5,5,4,3,3,2,3,2,8,6,7,6],mark:1,hier:1,champ:1,mut:[0,0],wyrd:1,P:['Ferocity','Aetheric Wyrd Powers'],S:['Agility','Combat','Savant','Heresy'],rules:['Gang Hierarchy (Champion)','Inured to Insanity','Power Over Prayer','Blood Magic','Idiosyncratic','Unsanctioned Psyker'],equip:'Pistols and Close Combat Weapons only.'},
+mutantlord:{n:'Mutant Lord',role:'Champion',cost:110,max:1,code:'L',st:[5,3,4,5,4,2,4,3,8,6,7,8],mark:1,hier:1,champ:1,mut:[1,3],free:1,P:['Combat','Ferocity','Savagery','Mutation'],S:['Brawn','Heresy'],rules:['Gang Hierarchy (Mutant Lord)','Prophet of Deformity'],equip:'Can use any weapon. Buys from the Mutant Lord list, Trading Post or Black Market.'},
+mutant:{n:'Mutant',role:'Ganger',cost:45,max:4,code:'M',st:[5,4,5,3,4,1,4,2,10,7,8,9],gf:1,mut:[1,2],spec:1,P:['Combat','Ferocity','Mutation'],S:['Cunning','Savagery','Heresy'],rules:['Gang Fighter (Ganger)','Promotion (Mutant Specialist)','Devotee of Deformity'],equip:'Pistols, Basic and Close Combat Weapons. A Specialist can also use Special Weapons.'},
+chosen:{n:'Chosen',role:'Prospect',cost:45,max:3,code:'C',st:[5,3,5,4,3,1,4,1,7,7,7,8],gf:1,mut:[0,0],P:['Combat','Heresy'],S:['Ferocity','Leadership','Savagery'],rules:['Berserker','Gang Fighter (Prospect)','Promotion (Champion)','Hot-Headed','Fast Learner','Eye of the Gods'],equip:'Anything on the Chosen list. Only Pistols or Close Combat Weapons from the Trading Post or Black Market.'},
+cultist:{n:'Cultist',role:'Ganger',cost:35,max:99,code:'U',st:[5,4,4,3,3,1,4,1,8,7,8,8],gf:1,mut:[0,0],spec:1,P:['Ferocity'],S:['Combat','Savagery','Heresy','Mutation'],rules:['Gang Fighter (Ganger)','Promotion (Cultist Specialist)'],equip:'Pistols, Basic and Close Combat Weapons. A Specialist can also use Special and Heavy Weapons.'},
+acolyte:{n:'Acolyte',role:'Juve',cost:20,max:99,code:'J',st:[6,5,5,3,3,1,4,2,9,8,9,10],gf:1,mut:[0,0],P:['Ferocity'],S:['Agility','Combat'],rules:['Gang Fighter (Juve)','Promotion (Acolyte)','Fast Learner','Insidious Infestation'],equip:'Weapons from the Acolyte list only.'},
+ogryn:{n:'Corrupted Ogryn',role:'Brute',cost:210,max:1,code:'',st:[5,3,5,5,5,3,4,3,7,6,8,9],brute:1,mut:[0,2],P:['Brawn','Ferocity','Savagery'],S:['Combat','Mutation'],rules:['Juggernaut','Murderous Brute','Slow-Witted'],equip:'Two Open Fists by default. Options below.'},
+daemon:{n:'Daemon',role:'Brute',cost:250,max:1,code:'',st:[6,3,4,4,4,3,4,3,9,4,6,7],mark:1,brute:1,rep:8,mut:[0,0],P:['Combat','Ferocity','Savagery'],S:['Brawn','Mutation'],rules:['Immaterial Member','Juggernaut','Terrifying','Incorporeal','Instability','Warp Denizen','Manifestation of Chaos','Mark of Chaos'],equip:'Vorpal Claws and Warpfire Breath.'},
+};
+FT.scrunt={n:'Scrunt Nathan',role:'Wretch',cost:1,max:1,code:'',st:[3,6,6,1,1,1,6,1,12,12,12,12],mut:[0,0],P:['Nothing'],S:['Nothing'],rules:['Snivelling Coward','Beneath Contempt','Grovel','Scrunt Happens','Faithless','Ritual Fodder','Absolutely Not a Chaos Spawn'],equip:'Armed with a Sharpened Spoon. Cannot be given any other weapons or equipment; he drops them.',secret:1};
+const ALLORDER=['apostle','disciple','sorcerer','mutantlord','mutant','chosen','cultist','acolyte','ogryn','daemon','scrunt'];
+const scruntOn=()=>!!(G.scrunt||LS.get('ss-scrunt',false));
+const ORDERF=()=>ALLORDER.filter(t=>t!=='scrunt'||scruntOn());
+
+const RULES={
+'Gang Leader':`A gang must always include one. This fighter may not retire. If they die or are lost, another fighter is promoted and gains this rule.`,
+'Gang Hierarchy (Leader)':`If the gang is Bottling and this fighter passes Cool, all friendly Chaos Cult fighters within 12" automatically pass. Can perform Post-Battle Actions.`,
+'Gang Hierarchy (Champion)':`If the gang is Bottling and this fighter passes Cool, all friendly Chaos Cult fighters within 6" automatically pass. Can perform Post-Battle Actions.`,
+'Gang Hierarchy (Mutant Lord)':`If the gang is Bottling and this fighter passes Cool, only friendly Mutant fighters within 6" automatically pass. Can perform Post-Battle Actions.`,
+'Group Activation (2)':`When this fighter activates, they may also activate two Ready fighters within 3". Announce at the start; resolve each activation fully, in any order. One Group Activation per gang per turn.`,
+'Group Activation (1)':`When this fighter activates, they may also activate one Ready fighter within 3". Announce at the start. One Group Activation per gang per turn.`,
+'The Eightfold Path':`The Apostle chooses the gang's Unholy Dedication and Path of Damnation.`,
+'Devotion':`Friendly fighters within 6" and line of sight may use the Apostle's Cool and Willpower instead of their own.`,
+'Amaranthine':`If this fighter suffers a Memorable Death, a random gang fighter suffers it instead as a Sacrifice; the Apostle then takes the Enfeebled Lasting Injury and the Crooked Body Mutation. This fighter cannot be Captured: a random fighter is captured instead.`,
+'Deranged Zeal':`Once per battle, may re-roll any misses on a Fight (Basic) action. If so, roll a D6: on 4+ they suffer 1 Flesh Wound at the end of their activation.`,
+'Inured to Insanity':`Can never gain the Insane condition.`,
+'Power Over Prayer':`Cannot use Articles of Damnation.`,
+'Blood Magic':`When casting a Wyrd Power, before rolling, remove up to 3 Flesh Wound tokens from enemy fighters. Each one adds +1 to the Willpower test.`,
+'Idiosyncratic':`If the gang has two Sorcerers, they must have different Wyrd Powers where possible.`,
+'Unsanctioned Psyker':`If taken Out of Action, the enemy gains a D3×10 credit bounty. If Captured and sold to the Guilders, worth their full value.`,
+'Prophet of Deformity':`Must buy 1–3 Mutations at recruitment. More Mutations than Toughness turns the fighter into a Chaos Spawn.`,
+'Gang Fighter (Ganger)':`Leaders and Champions may never outnumber fighters with the Gang Fighter (X) rule.`,
+'Gang Fighter (Prospect)':`Leaders and Champions may never outnumber fighters with the Gang Fighter (X) rule.`,
+'Gang Fighter (Juve)':`Leaders and Champions may never outnumber fighters with the Gang Fighter (X) rule.`,
+'Promotion (Mutant Specialist)':`At founding, one Ganger (Mutant or Cultist) can be a Specialist; in a campaign, via an Advancement. A Specialist may spend XP on skills and can use Special Weapons.`,
+'Promotion (Cultist Specialist)':`At founding, one Ganger (Cultist or Mutant) can be a Specialist; in a campaign, via an Advancement. A Specialist may spend XP on skills and can use Special and Heavy Weapons.`,
+'Devotee of Deformity':`Must buy 1–2 Mutations at recruitment. More Mutations than Toughness turns the fighter into a Chaos Spawn.`,
+'Berserker':`When making close combat attacks as part of a successful Charge (Double), gains +1 Attack.`,
+'Promotion (Champion)':`After five Advancements, may be promoted to Disciple. Loses Promotion, Hot-Headed, Fast Learner and Gang Fighter (Prospect).`,
+'Hot-Headed':`If a Prospect is Seriously Injured or taken Out of Action, friendly fighters within 3" don't check Nerve unless they are also Prospects.`,
+'Fast Learner':`May improve a characteristic any number of times without its cost increasing.`,
+'Eye of the Gods':`Rolls two D6 when generating Delusion Dice (if not Seriously Injured). Once per battle, may re-roll all Delusion Dice on an Article of Damnation Threshold test.`,
+'Promotion (Acolyte)':`After five Advancements, may be promoted to Cultist Specialist. Loses Promotion, Fast Learner, Gang Fighter (Juve) and Insidious Infestation.`,
+'Insidious Infestation':`After choosing crews, the gang may add D3 extra Juves with this rule, even above the scenario's crew limit.`,
+'Juggernaut':`When hit by a ranged attack, only Pinned if they lose a Wound or an Injury die is applied.`,
+'Murderous Brute':`Gains +1 random skill at recruitment from the Mutation or Savagery skill sets.`,
+'Slow-Witted':`Can never be included in a Group Activation.`,
+'Terrifying':`An enemy wanting to Fight, Charge or Shoot the Daemon must first check Willpower. If failed they can't take that action against it (they may pick another target).`,
+'Incorporeal':`4+ save that can't be modified by any means.`,
+'Instability':`Each End Phase, take a Willpower test adding the turn number. If failed, the Daemon suffers a Flesh Wound.`,
+'Warp Denizen':`Ignores all Lasting Injuries except Memorable Death.`,
+'Manifestation of Chaos':`On recruitment, generate 2 random skills from its Primary skill sets.`,
+'Snivelling Coward':`Automatically fails every Cool, Nerve and Willpower check. Whenever an enemy ends a move within 6" of him, he immediately Retreats 3" away from it and goes Prone, whimpering.`,
+'Beneath Contempt':`Enemies may ignore him for Target Priority. Taking him Out of Action earns no XP – it isn't worth mentioning. He never counts for Bottle tests or scenario objectives.`,
+'Grovel':`Grovel (Double): an enemy within 3" rolls a D6. On a 6, they take pity and can't attack him this round. On anything else they laugh, and he suffers a Flesh Wound from embarrassment.`,
+'Scrunt Happens':`Once per battle he may re-roll one of his own dice, but must keep the lower result.`,
+'Faithless':`Never generates Delusion Dice and can't invoke Articles of Damnation. If he Beseeches the Gods, the pool loses a die instead.`,
+'Ritual Fodder':`If he is in the gang, he is always chosen as the focus of the Dark Ritual. The gods remain unimpressed.`,
+'Absolutely Not a Chaos Spawn':`Can never gain Mutations or skills, and can't be Captured – nobody wants him. Even the Chaos Gods refuse to turn him into a Spawn.`,
+'Clamber':`Climbing costs no extra movement; every vertical surface counts as a ladder.`,
+'Omen of Fortune':`Once per game, if its owner is within 3", the owner checks Willpower before the enemy rolls to wound one successful hit. If passed, that attack misses.`,
+'Precognition':`3+ save that AP can never modify. If hit by a Blast or template, on a D6 roll of 1–3 it avoids damage.`,
+};
+
+/* Equipment: name, cost, category, who (A D S L M C U J), gang limit, rep, weapon profiles */
+const EQL=[
+['Hand Flamer',55,'pistol','ADSLMCU',0,0,['Hand Flamer']],
+['Autopistol',10,'pistol','ADSLMCUJ',0,0,['Autopistol']],
+['Laspistol',10,'pistol','ADSLMCUJ',0,0,['Laspistol']],
+['Stub Gun',5,'pistol','ADSLMCUJ',0,0,['Stub Gun']],
+['Dum Dum Rounds',5,'pistol','ADSLMCUJ',0,0,['Dum Dum Rounds']],
+['Bolt Pistol',35,'pistol','ADSC',3,0,['Bolt Pistol']],
+['Plasma Pistol',50,'pistol','ADSC',2,0,['Plasma Pistol – Low','Plasma Pistol – Maximal']],
+['Polearm / Autogun',20,'basic','ADLMU',0,0,['Polearm','Autogun (combi)']],
+['Polearm / Blunderbuss',40,'basic','ADLMU',2,0,['Polearm','Blunderbuss – Grape','Blunderbuss – Purgation']],
+['Autogun',15,'basic','ADLMUJ',0,0,['Autogun']],
+['Lasgun',15,'basic','ADLMU',0,0,['Lasgun']],
+['Steadholder Lever Gun',15,'basic','ADLMUJ',0,0,['Steadholder Lever Gun']],
+['Blunderbuss',25,'basic','ADLMU',2,0,['Blunderbuss – Grape','Blunderbuss – Purgation']],
+['Sawn-Off Shotgun',15,'basic','ADLMUJ',0,0,['Sawn-Off – Scatter']],
+['Solid Shot (Sawn-Off)',10,'basic','ADLMUJ',0,0,['Sawn-Off – Solid']],
+['Shotgun',30,'basic','ADLMUJ',0,0,['Shotgun – Scatter','Shotgun – Solid']],
+['Vengeance Rounds (Shotgun)',15,'basic','ADU',0,0,['Shotgun – Vengeance']],
+['Kroot Long Rifle',30,'basic','ADLMU',0,0,['Kroot Rifle – Ranged','Kroot Rifle – Melee']],
+['Boltgun',45,'basic','ADLMU',2,4,['Boltgun']],
+["Rak'Gol Razorgun",60,'basic','ADLMU',1,7,["Rak'Gol Razorgun"]],
+['Warpstorm Bolter',60,'basic','ADLMU',1,6,['Warpstorm Bolter']],
+['Flamer',100,'special','ADLMU',0,0,['Flamer']],
+['Long Rifle',30,'special','ADU',0,0,['Long Rifle']],
+['Grenade Launcher (Frag & Krak)',65,'special','ADU',2,0,['GL – Frag','GL – Krak']],
+['Choke Gas shells (GL)',35,'special','ADU',0,0,['GL – Choke Gas']],
+['Terror Gas shells (GL)',25,'special','ADU',0,0,['GL – Terror Gas']],
+['Smoke shells (GL)',15,'special','ADU',0,0,['GL – Smoke']],
+['Web Gun',125,'special','ADLMU',1,6,['Web Gun']],
+['Meltagun',135,'special','ADU',1,8,['Meltagun']],
+['Plasma Gun',100,'special','ADU',1,6,['Plasma Gun – Low','Plasma Gun – Maximal']],
+['Balefire Thrower',120,'special','ADLM',1,9,['Balefire Thrower']],
+['Neural Flayer',90,'special','ADLM',1,6,['Neural Flayer – Short','Neural Flayer – Full']],
+['Necrotic Beamer',110,'special','ADLM',1,7,['Necrotic Beamer – Ranged','Necrotic Beamer – Melee']],
+['Axe',10,'cc','ADSLMCUJ',0,0,['Axe']],
+['Boarding Shield',25,'cc','ADLMCU',0,0,['Boarding Shield']],
+['Chain Glaive',60,'cc','ADLC',0,0,['Chain Glaive']],
+['Chainsword',25,'cc','ADLMCU',0,0,['Chainsword']],
+['Chainaxe',25,'cc','ADLMC',0,0,['Chainaxe']],
+['Cleaver',20,'cc','ADSLMCUJ',0,0,['Cleaver']],
+['Fighting Knife',10,'cc','ADSLMCUJ',0,0,['Fighting Knife']],
+['Flail',20,'cc','ADLMCU',0,0,['Flail']],
+['Greatsword',40,'cc','ADLMC',0,0,['Greatsword']],
+['Flensing Knife',15,'cc','ADSLMCUJ',0,0,['Flensing Knife']],
+['Heavy Club',15,'cc','ADLMCU',0,0,['Heavy Club']],
+['Horrific Appendages',35,'cc','L',0,0,['Horrific Appendages']],
+['Maul',10,'cc','ADSLMCUJ',0,0,['Maul']],
+['Polearm',15,'cc','ADSLMCUJ',0,0,['Polearm']],
+['Power Sword',45,'cc','ADSLC',0,0,['Power Sword']],
+['Power Axe',35,'cc','ADLC',0,0,['Power Axe']],
+['Two-Handed Axe',25,'cc','ADLMCU',0,0,['Two-Handed Axe']],
+['Two-Handed Hammer',35,'cc','ADLMCU',0,0,['Two-Handed Hammer']],
+['Stiletto Sword',30,'cc','ADSLMC',0,0,['Stiletto Sword']],
+['Servo Claw',30,'cc','ADLMCU',0,0,['Servo Claw']],
+['Whip',15,'cc','ADSLMCU',0,0,['Whip']],
+["Desire's Needle",50,'cc','ADSLC',1,6,["Desire's Needle"]],
+['Goredrinker Axe',50,'cc','ADLC',1,8,['Goredrinker Axe']],
+["Hex'iron Blade",35,'cc','ADSLC',2,6,["Hex'iron Blade"]],
+['Tenebrous Scourge',50,'cc','ADLC',1,7,['Tenebrous Scourge']],
+['Whisperbane Knife',35,'cc','ADSLC',1,7,['Whisperbane Knife']],
+['Xenarch Death Arc',50,'cc','ADLC',1,9,['Xenarch Death Arc']],
+["'Phaeton' Heavy Flamer",125,'heavy','ADLU',0,0,['Phaeton Heavy Flamer']],
+['Heavy Stubber',130,'heavy','ADLU',1,0,['Heavy Stubber']],
+['Harpoon Launcher',75,'heavy','ADLU',0,0,['Harpoon Launcher']],
+['Missile Launcher',165,'heavy','ADLU',1,4,['Missile – Frag','Missile – Krak']],
+['Flak Armour',10,'armour','ADSLMCUJ',0,0],
+['Gutterforged Cloak',15,'armour','ADSLMCUJ',0,0],
+['Mesh Armour',20,'armour','ADSC',0,0],
+['Plate Mail',15,'armour','ADSLMCUJ',0,0],
+['Scrap Shield',15,'armour','ADSLMCUJ',0,0],
+['Mantle Malifica',30,'armour','ADS',0,0],
+['Ablative Overlay',20,'armour','AD',1,5],
+['Refractor Field',50,'armour','AS',0,0],
+['Blasting Charges',35,'grenade','ADUJ',2,0,['Blasting Charge']],
+['Choke Gas Grenades',50,'grenade','ADSLMC',2,0,['Choke Gas Grenade']],
+['Frag Grenades',30,'grenade','ADLMCUJ',2,0,['Frag Grenade']],
+['Incendiary Charges',40,'grenade','ADUJ',2,0,['Incendiary Charge']],
+['Krak Grenades',45,'grenade','ADUJ',2,0,['Krak Grenade']],
+['Smoke Grenades',15,'grenade','ADSLMCUJ',2,0,['Smoke Grenade']],
+['Shard Grenades',30,'grenade','ADSLC',2,5,['Shard Grenade']],
+['Cult Icon',40,'personal','ADLMCUJ',1,0],
+['Drop Rig',10,'personal','ADUJ',0,0],
+['Filter Plugs',10,'personal','ADUJ',0,0],
+['Photo-Goggles',35,'personal','ADSLM',0,0],
+['Respirator',15,'personal','ADSLMCUJ',0,0],
+['Skinblade',10,'personal','ADSC',0,0],
+['Strip Kit',15,'personal','ADC',0,0],
+['Cred Sniffer',25,'personal','ADSL',1,0],
+['Armoured Undersuit',25,'personal','ADLC',3,5],
+['Exotic Furs',50,'personal','ALC',0,6],
+['Opulent Jewellery',30,'personal','ASC',0,3],
+['Forged Guilder Seal',55,'personal','A',0,5],
+['Data Thief',35,'personal','A',0,5],
+['Hexagrammatic Fetish',35,'personal','ASL',0,3],
+['Uphive Raiments',45,'personal','A',0,5],
+['Mono-Sight',35,'accessory','ADSU',0,0],
+['Familiar',65,'beast','ADS',3,0],
+['Giant Rat',50,'beast','L',2,0],
+];
+const EQ={};EQL.forEach(([n,c,cat,who,lim=0,rep=0,p=[]])=>EQ[n]={n,c,cat,who,lim,rep,p});
+const CATS=[['pistol','Pistols'],['basic','Basic weapons'],['special','Special weapons'],['heavy','Heavy weapons'],['cc','Close combat weapons'],['armour','Armour'],['grenade','Grenades'],['personal','Personal equipment'],['accessory','Weapon accessories'],['beast','Exotic beasts']];
+const WHO=[['A','Apostle'],['D','Disciple'],['S','Sorcerer'],['L','Mutant Lord'],['M','Mutant'],['C','Chosen'],['U','Cultist'],['J','Acolyte']];
+
+/* Weapon profiles: Rng S, Rng L, Acc S, Acc L, Str, AP, D, Ammo, Traits */
+const WP={
+'Axe':['–','E','–','–','+1','–','1','–','Disarm, Melee'],
+'Boarding Shield':['–','E','–','–','S','–','–','–','Melee, Shield, Parry'],
+'Chainaxe':['–','E','–','+1','S+1','-1','1','–','Rending, Parry, Disarm, Melee'],
+'Chain Glaive':['E','2"','-1','–','S+2','-2','2','–','Unwieldy, Versatile, Melee'],
+'Chainsword':['–','E','–','+1','S','-1','1','–','Parry, Rending, Melee'],
+'Cleaver':['–','E','–','–','S+1','-1','1','–','Disarm, Melee'],
+'Fighting Knife':['–','E','–','–','S','-1','1','–','Backstab, Melee'],
+'Flail':['–','E','–','–','S','-1','1','–','Entangle, Melee'],
+'Greatsword':['E','1"','–','+1','S+1','-1','1','–','Sever, Unwieldy, Versatile, Melee'],
+'Heavy Club':['–','E','–','–','S','–','2','–','Concussion, Melee'],
+'Maul':['–','E','–','–','S','+1','2','–','Melee'],
+'Polearm':['E','2"','-1','–','S+1','–','1','–','Unwieldy, Versatile, Melee'],
+'Power Sword':['–','E','–','–','S+2','-2','1','–','Power, Parry, Melee'],
+'Two-Handed Axe':['–','E','–','-1','S+2','–','2','–','Unwieldy, Melee'],
+'Two-Handed Hammer':['–','E','–','-1','S+1','–','3','–','Knockback, Unwieldy, Melee'],
+'Power Axe':['–','E','–','–','S+2','-2','1','–','Power, Disarm, Melee'],
+'Stiletto Sword':['–','E','–','–','–','-1','–','–','Parry, Toxin, Melee'],
+'Servo Claw':['–','E','–','–','S+2','–','2','–','Melee'],
+'Vorpal Claws':['–','E','–','–','S','-2','2','–','Power, Melee'],
+'Whip':['E','3"','-1','–','S','–','1','–','Entangle, Versatile, Melee'],
+'Flensing Knife':['–','E','–','–','S','-1','1','–','Rending, Melee'],
+"Desire's Needle":['–','E','–','+1','–','-1','1','–','Toxin, Chem Delivery, Power, Melee'],
+'Goredrinker Axe':['–','E','–','–','+3','-1','2','–','Rending, Reckless, Melee'],
+"Hex'iron Blade":['–','E','–','–','+1','-3','1','–','Cursed, Parry, Melee'],
+'Tenebrous Scourge':['E','3"','–','–','S+3','–','1','–','Power, Entangle, Versatile, Melee'],
+'Whisperbane Knife':['–','E','–','+1','S','–','1','–','Scattershot, Backstab, Melee'],
+'Xenarch Death Arc':['E','5"','+1','–','3','–','1','2+','Rapid Fire (2), Shock, Versatile, Plentiful, Melee'],
+'Sharpened Spoon':['–','E','–','-1','S-1','–','1','–','Melee, Pathetic (no Wound roll can ever succeed on better than a 6)'],
+'Open Fist':['–','E','–','–','S','-1','1','–','Knockback, Melee'],
+'Power Maul':['–','E','–','–','S+2','-1','1','–','Power, Melee'],
+'Horrific Appendages':['–','E','–','–','S','-1','2','–','Pulverise, Rending, Melee'],
+'Autogun':['8"','24"','+1','–','3','–','1','4+','Rapid Fire (1)'],
+'Autogun (combi)':['8"','24"','+1','–','3','–','1','5+','Rapid Fire (1)'],
+'Blunderbuss – Grape':['–','T','–','–','2','–','1','6+','Scattershot, Plentiful, Template'],
+'Blunderbuss – Purgation':['–','T','–','–','3','–','1','6+','Blaze, Scarce, Template'],
+'Sawn-Off – Scatter':['4"','8"','+2','–','2','–','1','4+','Scattershot, Plentiful'],
+'Sawn-Off – Solid':['8"','16"','+1','–','4','–','2','4+','Knockback, Plentiful'],
+'Shotgun – Vengeance':['4"','16"','+1','–','4','–','1','5+','Blaze, Scattershot'],
+'Shotgun – Scatter':['4"','8"','+2','–','2','–','1','4+','Scattershot'],
+'Shotgun – Solid':['8"','16"','+1','–','4','–','2','4+','Knockback'],
+'Lasgun':['18"','24"','+1','–','3','–','1','2+','Plentiful'],
+'Boltgun':['12"','24"','+1','–','4','-1','2','6+','Rapid Fire (1)'],
+'Steadholder Lever Gun':['10"','24"','–','–','4','–','1','3+','Hunting'],
+'Kroot Rifle – Ranged':['12"','24"','+1','–','4','–','1','4+','Knockback, Plentiful'],
+'Kroot Rifle – Melee':['E','2"','–','–','S+1','–','1','–','Disarm, Versatile, Melee'],
+"Rak'Gol Razorgun":['6"','20"','–','-1','–','-2','1','6+','Rapid Fire (2), Toxin'],
+'Warpstorm Bolter':['12"','24"','+1','–','4','-1','2','6+','Rapid Fire (1), Cursed, Scarce'],
+'Autopistol':['4"','12"','+1','–','3','–','1','4+','Rapid Fire (1), Sidearm'],
+'Hand Flamer':['–','T','–','–','3','–','1','5+','Blaze, Template'],
+'Stub Gun':['6"','12"','+2','–','3','–','1','4+','Plentiful, Sidearm'],
+'Dum Dum Rounds':['5"','10"','+1','–','4','–','1','4+','Limited, Sidearm'],
+'Laspistol':['8"','12"','+1','–','3','–','1','2+','Plentiful, Sidearm'],
+'Bolt Pistol':['6"','12"','+1','–','4','-1','2','6+','Sidearm'],
+'Plasma Pistol – Low':['6"','12"','+2','–','5','-1','2','5+','Scarce, Sidearm'],
+'Plasma Pistol – Maximal':['6"','12"','+1','–','7','-2','3','5+','Unstable, Scarce, Sidearm'],
+'Blasting Charge':['–','S×2','–','–','5','-1','2','5+','Blast (5"), Knockback, Grenade'],
+'Choke Gas Grenade':['–','S×3','–','–','–','–','–','5+','Blast (3"), Gas, Grenade'],
+'Frag Grenade':['–','S×3','–','–','3','–','1','4+','Blast (3"), Knockback, Grenade'],
+'Incendiary Charge':['–','S×3','–','–','3','–','1','5+','Blast (5"), Blaze, Grenade'],
+'Krak Grenade':['–','S×3','–','-1','6','-2','2','4+','Demolitions, Grenade'],
+'Smoke Grenade':['–','S×3','–','–','–','–','–','4+','Blast (3"), Smoke, Grenade'],
+'Shard Grenade':['–','S×3','–','–','2','-2','1','4+','Blast (5"), Cursed, Rending, Grenade'],
+'Flamer':['–','T','–','–','4','-1','1','5+','Blaze, Template'],
+'GL – Frag':['6"','24"','-1','–','3','–','1','6+','Blast (3"), Knockback'],
+'GL – Krak':['6"','24"','-1','–','6','-2','2','6+','–'],
+'GL – Choke Gas':['6"','24"','-1','–','–','–','–','5+','Blast (3"), Gas, Limited'],
+'GL – Terror Gas':['6"','24"','-1','–','–','–','–','6+','Blast (5"), Gas, Fear, Limited'],
+'GL – Smoke':['6"','24"','-1','–','–','–','–','4+','Blast (5"), Smoke'],
+'Long Rifle':['24"','48"','–','+1','4','-1','1','4+','Knockback'],
+'Web Gun':['–','T','–','–','5','–','–','5+','Web, Silent, Template'],
+'Meltagun':['6"','12"','+1','–','8','-4','3','4+','Melta, Scarce'],
+'Plasma Gun – Low':['12"','24"','+2','–','5','-1','2','5+','Rapid Fire (1), Scarce'],
+'Plasma Gun – Maximal':['12"','24"','+1','–','7','-2','3','5+','Unstable, Scarce'],
+'Balefire Thrower':['–','T','–','–','4','-1','2','5+','Blaze, Cursed, Template'],
+'Neural Flayer – Short':['–','T','–','–','–','–','–','4+','Concussion, Flash, Template'],
+'Neural Flayer – Full':['–','T','–','–','–','–','–','6+','Concussion, Flash, Gas, Fear, Pulverise, Template'],
+'Necrotic Beamer – Ranged':['6"','12"','–','-1','6','-1','3','6+','Melta, Scattershot, Scarce'],
+'Necrotic Beamer – Melee':['E','3"','+1','–','3','–','3','–','Melta, Versatile, Melee'],
+'Warpfire Breath':['–','T','–','–','4','-2','–','3+','Cursed, Template'],
+'Phaeton Heavy Flamer':['–','T','–','–','5','-2','1','4+','Blaze, Template, Rapid Fire (1), Firestorm'],
+'Heavy Stubber':['20"','40"','–','-1','4','-1','1','4+','Rapid Fire (2), Unwieldy'],
+'Harpoon Launcher':['6"','18"','+2','–','5','-3','1','5+','Drag, Impale, Scarce'],
+'Missile – Frag':['24"','48"','+1','–','4','-1','1','6+','Blast (5"), Knockback, Unwieldy'],
+'Missile – Krak':['24"','48"','+1','–','6','-2','3','6+','Unwieldy'],
+};
+const WPG=[
+['Close combat weapons',['Axe','Boarding Shield','Chainaxe','Chain Glaive','Chainsword','Cleaver','Fighting Knife','Flail','Greatsword','Heavy Club','Maul','Polearm','Power Sword','Two-Handed Axe','Two-Handed Hammer','Power Axe','Stiletto Sword','Servo Claw','Vorpal Claws','Whip','Flensing Knife',"Desire's Needle",'Goredrinker Axe',"Hex'iron Blade",'Tenebrous Scourge','Whisperbane Knife','Xenarch Death Arc','Open Fist','Power Maul','Horrific Appendages']],
+['Basic weapons',['Autogun','Autogun (combi)','Blunderbuss – Grape','Blunderbuss – Purgation','Sawn-Off – Scatter','Sawn-Off – Solid','Shotgun – Vengeance','Shotgun – Scatter','Shotgun – Solid','Lasgun','Boltgun','Steadholder Lever Gun','Kroot Rifle – Ranged','Kroot Rifle – Melee',"Rak'Gol Razorgun",'Warpstorm Bolter']],
+['Pistols',['Autopistol','Hand Flamer','Stub Gun','Dum Dum Rounds','Laspistol','Bolt Pistol','Plasma Pistol – Low','Plasma Pistol – Maximal']],
+['Grenades',['Blasting Charge','Choke Gas Grenade','Frag Grenade','Incendiary Charge','Krak Grenade','Smoke Grenade','Shard Grenade']],
+['Special weapons',['Flamer','GL – Frag','GL – Krak','GL – Choke Gas','GL – Terror Gas','GL – Smoke','Long Rifle','Web Gun','Meltagun','Plasma Gun – Low','Plasma Gun – Maximal','Balefire Thrower','Neural Flayer – Short','Neural Flayer – Full','Necrotic Beamer – Ranged','Necrotic Beamer – Melee','Warpfire Breath']],
+['Heavy weapons',['Phaeton Heavy Flamer','Heavy Stubber','Harpoon Launcher','Missile – Frag','Missile – Krak']],
+];
+
+const EQD={
+'Flak Armour':`6+ save; 5+ against Blast markers and Flame templates.`,
+'Gutterforged Cloak':`Combines with other armour (not field armour). 6+ save; 5+ against environmental effects.`,
+'Mesh Armour':`5+ save.`,
+'Plate Mail':`6+ save; 5+ against attacks from the front vision arc (not if lacking a facing). Always 5+ against Blast markers.`,
+'Scrap Shield':`Combines with other armour (not field armour). +1 save against Reaction attacks.`,
+'Mantle Malifica':`5+ save; unmodifiable 4+ against psychic powers. Each End Phase check Willpower – if failed, gain the Insane condition.`,
+'Ablative Overlay':`With other armour +2 save. Alone: 5+ for the first save, 6+ for the second. Unusable after two hits.`,
+'Refractor Field':`When hit, D6: on 5+ the hit is disregarded, then D6: on a 1 the field burns out permanently.`,
+'Boarding Shield':`Combines with other armour (not field armour). Shield trait: +2 save vs melee and +1 vs ranged inside the vision arc; no bonus without a facing.`,
+'Cult Icon':`Grants Group Activation (1), or +1 to an existing one. Rolls 3 dice when generating Delusion Dice. One per gang.`,
+'Drop Rig':`If Active within 1" of an edge, Descend (Basic): move up to 3" horizontally and 12" down.`,
+'Filter Plugs':`+1 Toughness against Gas. One use.`,
+'Photo-Goggles':`Spot enemies up to 12" in Pitch Black; see through smoke; −1 to Initiative against Blind from Flash.`,
+'Respirator':`+2 Toughness against Gas.`,
+'Skinblade':`If Captured, D6: 1–2 escape fails; 3–4 escape but roll Lasting Injury; 5–6 escape, skinblade discarded.`,
+'Strip Kit':`+2 to Intelligence checks for door terminals, loot casket locks and similar.`,
+'Cred Sniffer':`If not Seriously Injured or Out of Action at the end of a battle, gain 4D6 credits. One per gang.`,
+'Armoured Undersuit':`With other armour (not field) +1 save; alone 6+ save.`,
+'Exotic Furs':`On a Trade Post-Battle Action: +1 Rarity at the Trading Post or +1 Illegal at the Black Market for this fighter.`,
+'Opulent Jewellery':`May re-roll the doc's fee on a Medical Escort Post-Battle Action.`,
+'Uphive Raiments':`If not in Recovery, gain D3×10 credits after each battle.`,
+'Forged Guilder Seal':`Trading Post: −2 Rarity and −3D6 credits per item (min 10). On a double 1 or double 6 the Seal is lost and the gang is declared Outlaw.`,
+'Hexagrammatic Fetish':`Roll D6 on purchase. 1: junk – discard and gain 3D6 credits. 2–5: psykers targeting the wearer get −1 Willpower. 6: as 2–5 but −3.`,
+'Data Thief':`On the Apostle's list; the original book gives no rules for it.`,
+'Mono-Sight':`Basic, Special or Heavy weapon: Aim (Basic) gives +2 to hit instead of +1.`,
+'Familiar':`Exotic Beast bound to this fighter (max 1 per fighter). M6" WS3+ BS5+ S2 T3 W1 I3+ A2 Ld10+ Cl7+ WP6+ Int6+. Clamber, Omen of Fortune, Precognition.`,
+'Giant Rat':`Exotic Beast – use the core rules profile.`,
+};
+
+const MUTL=[
+['11–13','Void Soul',15,`Immune to Psychic Powers and Articles of Damnation, positive and negative.`],
+['14–16','Eye Stalks',20,`In cover, ranged attacks against them get an extra −1. Vision arc 180°. With Two Heads: 360°.`],
+['21–23','Extra Appendages',20,`+1 Attack. May use up to three Sidearm or Melee weapons at once (three pistols with Twin Guns Blazing).`],
+['24–26','Horrific Appearance',15,`Gains Fearsome. Enemies starting their activation within 3" must make a Nerve test.`],
+['31–32','Massive Claws',10,`Unarmed attacks are +1 Strength, AP −1, with Rending.`],
+['33','Vampiric',10,`Once per Fight (Basic), on inflicting a Flesh Wound or Serious Injury in melee, remove 1 of their own Flesh Wounds.`],
+['34–36','Needle Spines',15,`Melee attacks against them −1 to hit. Once per battle, Fire Spines (Basic): every other fighter within 3" takes S–, AP −1, D1 with Toxin.`],
+['41–43','Scaly Skin',25,`Natural 4+ save that armour cannot improve.`],
+['44–46','Tentacles',10,`Re-roll failed Initiative tests for falling. Gains Parry.`],
+['51–53','Toxic Blood',10,`When wounded, every other fighter within 1" tests Initiative; those who fail take S–, AP −1, D1 with Toxin.`],
+['54–56','Two Heads',10,`No to-hit penalty for Twin Guns Blazing. Vision arc 180°. With Eye Stalks: 360°.`],
+['61–63','Vast Bulk',20,`+1 Wounds.`],
+['64','Crooked Body',10,`Ranged attacks against them get an extra −1 at long range. Can no longer wear armour.`],
+['65','Twisted Flesh',15,`Discards 1 Flesh Wound on activation. Never benefits from Bio-Boosters or Medicae Kits, or Recovery assistance.`],
+['66','Wing Membranes',15,`Leaps up to their Movement without an Initiative test. Never damaged or knocked Prone by falling.`],
+];
+const MUTS={};MUTL.forEach(([d,n,c,t])=>MUTS[n]={d,n,c,t});
+
+const HERESY=[
+['Aura of Despair',`All enemies within 12" suffer −2 to Cool and Willpower checks.`],
+['Soul Hound',`After deployment, nominate one enemy on the battlefield. For this battle, attacks against them get +1, and they can't use Infiltrate or Lie Low.`],
+['Profane Conduit',`Immune to Coup de Grace. Can make Reaction attacks while Seriously Injured, and take Congregate (Double): move full Movement + D3" towards a friendly fighter.`],
+['Hagiocracy',`Friendly Juves and Prospects within 12" and line of sight get +2 Cool and Willpower. Rolls three D6 when generating Delusion Dice (if not Seriously Injured).`],
+['I Feel the Warp Overtaking Me',`On activation, may declare a third action. Willpower test at −3: as written, if failed they take the third action; otherwise the activation ends, all actions wasted. Always Pinned at the end of the activation.`],
+['Man Catcher',`Instead of Coup de Grace, Subjugate (Simple): the enemy goes Out of Action and rolls Lasting Injury but is set aside. Each set-aside fighter adds +1 to the post-battle Capture roll.`],
+];
+const SAVAGERY=[
+['Avatar of Blood',`Each unsaved wound inflicted with a Melee weapon discards one of their Flesh Wounds.`],
+['Scorn',`Can Disrupt enemy Wyrd Powers targeting them or a friend within 12", as a psyker. Once per round, may nullify one Article of Damnation by passing Willpower.`],
+['The Sound and the Fury',`If Standing, Active and Ready when an enemy completes a Charge within 6", may discard Ready to Charge that enemy. Theirs resolves first.`],
+['Frenzy',`On a successful Charge, gains D3+1 Attacks instead of +1. If any attack misses, suffers 1 Flesh Wound.`],
+['Killing Blow',`May swap all attacks for a single Killing Blow: if it hits, Strength and Damage are doubled and no armour save is allowed. Not with Sidearms.`],
+['Slaughterborn',`Each unsaved wound inflicted with a Melee weapon gives +1" Movement (max +8") for the battle.`],
+];
+const WYRD=[
+['Warp Rift','Basic',`Reposition the fighter anywhere within 8", at least 1" from enemies.`],
+['Prescience','Basic, Continuous',`While maintained, every enemy within 18" in full cover counts as partial cover, and partial cover counts as in the open.`],
+['Noxious Pit','Basic, Continuous',`Place a Blast (5") within 12" and line of sight; it stays while maintained. Any fighter touching it takes S–, AP −1, D1 with Toxin.`],
+['Bolt of Change','Basic',`Target an enemy within 6" and line of sight, check Ballistic Skill: if passed, S8, AP −3, D3 hit with Melta.`],
+['Malevolent Artifice','Simple',`An enemy within 18" must immediately make an Ammo check.`],
+['Dominate','Basic',`An enemy within 9" immediately takes a free Shoot (Basic) action against a target the psyker chooses.`],
+];
+
+const KTABLE=[
+['Apostle',['–','P','P','–','P','S','–','–','P','S','S']],
+['Disciple',['–','P','P','–','P','–','–','–','S','S','S']],
+['Sorcerer',['S','–','S','–','P','–','–','S','–','S','–']],
+['Mutant Lord',['–','S','P','–','P','–','–','–','P','S','P']],
+['Mutant',['–','–','P','S','P','–','–','–','S','S','P']],
+['Chosen',['–','–','P','–','S','S','–','–','S','P','–']],
+['Cultist',['–','–','S','–','P','–','–','–','S','S','S']],
+['Acolyte',['S','–','S','–','P','–','–','–','–','–','–']],
+['Chaos Spawn',['–','–','P','–','P','–','–','–','–','–','P']],
+['Familiar',['S','–','–','S','P','–','–','P','–','–','–']],
+['Daemon',['–','S','P','–','P','–','–','–','P','–','S']],
+['Corrupted Ogryn',['–','P','S','–','P','–','–','–','P','–','S']],
+];
+
+const DECAY=[
+['Disgusting Vigour',`Each activation, before acting, check Willpower. If passed, they recover 1 Wound lost earlier in the battle.`],
+['Reanimator',`Can come out of Recovery to fight in a battle, but starts it with one Flesh Wound.`],
+['Pathogenesis',`Melee attacks gain the Rad-Phage trait. On a Coup de Grace, roll twice for Lasting Injury and choose which to apply.`],
+['Draugr',`Doesn't lose Toughness from Flesh Wounds, but still goes Out of Action at Flesh Wounds equal to their Toughness.`],
+['Even in Death I Still Serve',`On going Out of Action, may immediately take a free Shoot (Basic) or Fight (Basic) action before being removed.`],
+['Gelatine Absorber',`Each enemy they take Out of Action with a Melee weapon or Coup de Grace gives +1 Wound or removes 1 Flesh Wound (max +7 Wounds) for the battle. May Coup de Grace friendly fighters, and gets a free Coup de Grace after offering assistance.`],
+];
+const FLUX=[
+['Augury',`Once per round, if Standing and Active, interrupt an enemy's Charge with a free out-of-sequence Shoot (Basic). Declare when the charge is announced; if the target ends Pinned or Seriously Injured, their activation ends and the charge is wasted.`],
+['Deception',`From the start of each round until this fighter activates, an enemy targeting them with a ranged attack must first check Willpower at −1. If failed, they may pick another target; otherwise the action is wasted.`],
+['Providence',`Once per battle, after rolling any die, change its result to a 6.`],
+['Chronokinesis',`When hit in close combat, check Willpower before the wound roll; if passed, one hit is negated. Usable any number of times a round, once per enemy.`],
+['Moros',`Dying of the Light (Basic): target an enemy in line of sight. For the rest of the round, friendly fighters may ignore Target Priority to attack it, and Shoot actions against it re-roll failed hits.`],
+['Doppelgeist',`After crews are chosen, try to add one extra friendly fighter, even beyond the scenario's crew size. The enemy Leader prevents it by passing an Intelligence check at −1.`],
+];
+const EXCESS=[
+['Lust',`Move and Charge actions may pass over or through enemies (ending at least 1" away), and cross barricades up to 2" high without losing movement.`],
+['Soporific Lies',`Post-Battle Action Silver Tongue: check Intelligence. If passed, the enemy gang loses D3 Rep and yours gains the same.`],
+['Phantasmagoria',`Once per round, on becoming Engaged, take a free Retreat (Basic) before any close combat happens. Doesn't affect Ready.`],
+['Painful Passion',`Declare at the start of an activation: +1 Weapon Skill, Movement and Attacks for the battle, then a Flesh Wound at the end of the activation. Can be used repeatedly.`],
+['Euphoria',`After two consecutive Move (Simple) actions, check Initiative. If passed, regain a lost Wound or discard a Flesh Wound.`],
+['Sadist',`Giver: +1 Attack each time they take an enemy Out of Action with a Melee weapon. Receiver: +1 Attack each time they suffer a Flesh Wound. Max +6 Attacks from these; lasts the battle.`],
+];
+const GODSKILL={Savagery:SAVAGERY,Decay:DECAY,Flux:FLUX,Excess:EXCESS};
+/* Standard Necromunda skill sets – short summaries; check the rulebook for exact wording */
+const CORESKILL={
+Agility:[
+['Catfall',`When falling or jumping down, count the vertical distance as half. Isn't Pinned by the fall unless it causes an injury.`],
+['Clamber',`Climbs at full Movement – vertical distance is not doubled when climbing.`],
+['Dodge',`When hit by a ranged or melee attack, roll a D6 before saves: on a 6 the attack is dodged. Against Blast or Template, a 6 lets the fighter move out of the area instead.`],
+['Mighty Leap',`Can leap gaps of 2" or less without making a check.`],
+['Spring Up',`If Pinned when activated, make an Initiative check to stand up for free. If it fails, the fighter can still Stand Up as normal.`],
+['Sprint',`If the fighter makes two Move actions in an activation, the second can be a Sprint, moving up to double their Movement.`]],
+Brawn:[
+['Bull Charge',`When charging, Melee weapons (not Sidearms) gain Knockback and hit at +1 Strength.`],
+['Bulging Biceps',`Can use an Unwieldy weapon one-handed.`],
+['Crushing Blow',`Before rolling to hit in a Fight action, nominate one die. If it hits, that attack gets +1 Strength and +1 Damage.`],
+['Headbutt',`Headbutt (Basic) against an Engaged enemy: roll 2D6. If either is 4+, the enemy takes a hit at this fighter's Strength +2, Damage 2. Otherwise this fighter takes a hit at its own Strength, Damage 1.`],
+['Hurl',`Hurl (Basic): with a passed Initiative check, throw an Engaged enemy (or friend) D3" in any direction. They take a hit, as does anyone they land on.`],
+['Iron Jaw',`Counts as two points higher Toughness against unarmed attacks.`]],
+Combat:[
+['Combat Master',`Ignores hit penalties from interference, and can always assist friends however many enemies are Engaged with them.`],
+['Counter-attack',`When making Reaction attacks, roll one extra Attack die for each of the attacker's attacks that missed.`],
+['Disarm',`Melee weapons gain the Disarm trait. If a weapon already has it, the enemy is disarmed on a 5 or 6.`],
+['Parry',`Can parry as if carrying a weapon with the Parry trait. If they already have one, they can parry two attacks.`],
+['Rain of Blows',`Fight is a Simple action for this fighter, so they can Fight twice in one activation.`],
+['Step Aside',`When hit in melee, make an Initiative check: if passed, the hit is ignored. Once per enemy Fight action.`]],
+Cunning:[
+['Backstab',`Melee weapons gain the Backstab trait.`],
+['Escape Artist',`Bonus to Initiative checks when Retreating from combat, and a better chance to escape if Captured.`],
+['Evade',`While Standing and Active, ranged attacks against this fighter get −1 to hit, or −2 at Long range.`],
+['Infiltrate',`Set up after all other fighters, anywhere out of sight of and more than 6" from enemies. If both sides have Infiltrators, roll off.`],
+['Lie Low',`While Prone, enemies can only target this fighter with ranged attacks from within the weapon's Short range.`],
+['Overwatch',`If Standing, Active and not yet activated this round, can interrupt a visible enemy's action to make a Shoot action. Then counts as activated.`]],
+Ferocity:[
+['Berserker',`Rolls one extra Attack die when making a Charge action.`],
+['Fearsome',`An enemy that wants to charge this fighter must first pass a Willpower check, or it can't charge them.`],
+['Impetuous',`Can Consolidate up to 4" instead of 2".`],
+['Nerves of Steel',`When hit by a ranged attack, make a Cool check to avoid being Pinned.`],
+['True Grit',`Roll one fewer Injury die for this fighter (minimum one). If only one would be rolled, roll two and pick.`],
+['Unstoppable',`Before a Recovery test, roll a D6: on 4+ discard a Flesh Wound. If there are none, roll two Injury dice and choose one.`]],
+Leadership:[
+['Commanding Presence',`Group activations can include one more fighter.`],
+['Inspirational',`If a friendly fighter within 6" fails a Cool check, this fighter can take a Leadership check; if passed, the Cool check counts as passed.`],
+['Iron Will',`While this fighter is on the battlefield and not Seriously Injured, subtract 1 from the gang's Bottle tests.`],
+['Mentor',`When a friendly fighter within 6" gains XP, make a Leadership check: if passed, they gain an extra XP.`],
+['Overseer',`Order (Double): pick a friendly fighter within 6" and make a Leadership check. If passed, the friend can immediately make one action.`],
+['Regroup',`At the end of this fighter's activation, if Standing and Active, make a Leadership check: if passed, Broken friends within 6" recover.`]],
+Shooting:[
+['Fast Shot',`Shoot is a Simple action for this fighter (not with Unwieldy weapons), so they can shoot twice.`],
+['Gunfighter',`No −1 hit penalty when firing two pistols (Twin Guns Blazing).`],
+['Hip Shooting',`Run and Gun (Double): move up to their Movement, then Shoot at −1 to hit. Not with Unwieldy weapons.`],
+['Marksman',`Ignores target priority. A natural 6 to hit (not Blast or Template) doubles the attack's Damage.`],
+['Precision Shot',`A natural 6 to hit with a ranged attack ignores cover.`],
+['Trick Shot',`Reduced hit penalties for shooting at Engaged targets or targets in cover.`]],
+Savant:[
+['Ballistics Expert',`When Aiming, +2 to hit instead of +1.`],
+['Connected',`Can trade post-battle with easier access to rare and illegal items.`],
+['Fixer',`If in the crew and not taken Out of Action, the gang earns extra income after the battle.`],
+['Medicae',`When assisting a friend's Recovery test, Out of Action results can be re-rolled.`],
+['Munitioneer',`Failed Ammo checks for this fighter or friends within 6" can be re-rolled.`],
+['Savvy Trader',`Bonus to Rarity checks when trading, and items cost less.`]]};
+const COREKEYS=['Agility','Brawn','Combat','Cunning','Ferocity','Leadership','Shooting','Savant'];
+const ALLSKILLS=[...COREKEYS.flatMap(k=>CORESKILL[k]),...HERESY,...SAVAGERY,...DECAY,...FLUX,...EXCESS];
+/* All skill sets in Necromunda order, with this gang's god set and Heresy */
+function skillSets(){return [...COREKEYS.map(k=>[k,CORESKILL[k]]),[D().god,GODSKILL[D().god]],['Heresy',HERESY]]}
+const skillsOf=f=>String(f.skills||'').split(',').map(x=>x.trim()).filter(Boolean);
+const setSkills=(f,a)=>{f.skills=a.join(', ')};
+function skillText(n){for(const [,L] of skillSets()){const h=L.find(x=>x[0]===n);if(h)return h[1]}const h=ALLSKILLS.find(x=>x[0]===n);return h?h[1]:''}
+function skillSetName(n){const hit=skillSets().find(([,L])=>L.some(x=>x[0]===n));if(hit)return hit[0];for(const k in GODSKILL)if(GODSKILL[k].some(x=>x[0]===n))return k;return ''}
+const DED={
+khorne:{key:'khorne',n:'Khorne',title:'The Lord of Skin and Sinew',aka:'the Blood God, the Scratcher and the Red One',mark:'Mark of Khorne',god:'Savagery',rep:8,xp:[8,2],fav:'khorne',mods:{WS:-1,BS:2,Cl:-2},traits:[['Martial','+1 Weapon Skill, +2 Cool'],['Frenzied','−2 Ballistic Skill'],['Eternal Rivalry','Hatred (The Mark of Slaanesh)']]},
+nurgle:{key:'nurgle',n:'Nurgle',title:'The Plague Lord',aka:'the Rotfather, the Fly Lord, the King in Rags and Tatters and Old Festus',mark:'Mark of Nurgle',god:'Decay',rep:7,xp:[7,1],fav:'nurgle',mods:{W:1,M:-1,I:1},traits:[['Corpulent','+1 Wounds'],['Dulled','−1 Movement and Initiative'],['Eternal Rivalry','Hatred (The Mark of Tzeentch)']]},
+tzeentch:{key:'tzeentch',n:'Tzeentch',title:'The Architect of Fate',aka:'the Whisperer, the Lord of Lies, the Watcher and the Dreamer',mark:'Mark of Tzeentch',god:'Flux',rep:9,xp:[9,2],fav:'tzeentch',mods:{Cl:-1,Ld:-1,WP:-1,Int:-1,A:-1},traits:[['Lofty','+1 Cool and Leadership'],['Studious','+1 Willpower and Intelligence'],['Withered','−1 Attack'],['Eternal Rivalry','Hatred (The Mark of Nurgle)']]},
+slaanesh:{key:'slaanesh',n:'Slaanesh',title:'The Dark Prince',aka:'the Pale One, the Pleasure Lord, the Nightwild and the Shadow Ruler',mark:'Mark of Slaanesh',god:'Excess',rep:6,xp:[6,1],fav:'slaanesh',mods:{WS:-1,I:-1,Int:1,WP:2},traits:[['Graceful','+1 Weapon Skill and Initiative'],['Depraved','−1 Intelligence and −2 Willpower'],['Eternal Rivalry','Hatred (The Mark of Khorne)']]},
+undivided:{key:'undivided',n:'Chaos Undivided',title:'The Path of Chaos Undivided',aka:'the four Chaos Gods worshipped as one pantheon',mark:'Mark of Chaos Undivided',god:'Savagery',rep:null,xp:'triple',fav:'hierarch',mods:{},traits:[]},
+};
+const DEDKEYS=['khorne','nurgle','tzeentch','slaanesh','undivided'];
+const UNDIV={vicious:{n:'Vicious',t:'+1 Strength, −1 Willpower and Intelligence',mods:{S:1,WP:1,Int:1}},tenacious:{n:'Tenacious',t:'+1 Toughness, −1 Weapon Skill',mods:{T:1,WS:1}},devious:{n:'Devious',t:'+1 random Secondary skill, −1 Leadership and Willpower',mods:{Ld:1,WP:1}},malicious:{n:'Malicious',t:'+1 Attack, −1 Cool, −2 Intelligence',mods:{A:1,Cl:1,Int:2}}};
+const FAV={
+khorne:{god:'The Lord of Skin and Sinew',r:'Ritual of Blood',b:['Once per round, the gang can re-roll one failed Wound roll.','The Gang Leader gains +1 Attack.','Chaos Spawn gain +1 Strength.']},
+nurgle:{god:'The Plague Lord',r:'Ritual of Filth',b:['Once per round, the gang can re-roll one failed Recovery attempt.','The Gang Leader gains +1 Wounds.','Chaos Spawn gain +1 Toughness.']},
+tzeentch:{god:'The Architect of Fate',r:'Ritual of Prophecy',b:['Once per round, one fighter can ignore all negative modifiers on a Shoot (Basic) or (Double) action.','The Gang Leader gains a 4+ save that can’t be modified.','Chaos Spawn gain a 4+ armour save.']},
+slaanesh:{god:'The Dark Prince',r:'Ritual of Pain',b:['Once per round, the gang can activate two Ready fighters one after the other.','The Gang Leader gains +2" Movement.','Chaos Spawn roll two D6 for Movement and use the highest.']},
+hierarch:{god:'The Hierarch of Anarchy and Terror',r:'Ritual of Malice',b:['Once per round, nullify a successful Wyrd Power or Article of Damnation.','The Gang Leader must re-roll failed wound rolls in melee.','Chaos Spawn gain +D3 Attacks when they make a Fight action.']},
+};
+const SKT={khorne:KTABLE,
+nurgle:[['Apostle','–SSSPP––PSP'],['Disciple','–P––P–S–SSS'],['Sorcerer','–S–SS––S–SP'],['Mutant Lord','–SS–P–––PSP'],['Mutant','–SS–P–––SSP'],['Chosen','––S–PS–SS–P'],['Cultist','–PS–S–S––SS'],['Acolyte','–S–PS––––––'],['Chaos Spawn','–P––P–––––P'],['Familiar','–––SS––P––P'],['Daemon','–S––P–––PSP'],['Corrupted Ogryn','–PS–P–––S–P']],
+tzeentch:[['Apostle','S––P–SSPPSP'],['Disciple','––SPS–P–SSS'],['Sorcerer','–––S–––SPSP'],['Mutant Lord','–S–SP–––PSP'],['Mutant','–––PS–S–SSP'],['Chosen','––SPSS–––SP'],['Cultist','P–S–S–S––SS'],['Acolyte','S––P––S––––'],['Chaos Spawn','S–––P–––––P'],['Familiar','P––S–––P––S'],['Daemon','S––––––SPPP'],['Corrupted Ogryn','–P–PS–––S–P']],
+slaanesh:[['Apostle','P–PSP–––PSS'],['Disciple','P–P–S–––SSS'],['Sorcerer','S––S–––SPS–'],['Mutant Lord','–SP–P–––SSP'],['Mutant','P–S–P–––SSP'],['Chosen','S–P–S––SPSS'],['Cultist','––S–P–S––SS'],['Acolyte','S––S––P––––'],['Chaos Spawn','P–––S–––––P'],['Familiar','P––S–––PS––'],['Daemon','P–P–S–––P–S'],['Corrupted Ogryn','S–P–P–––S–S']],
+undivided:[['Apostle','––SPPPSS–PS'],['Disciple','–SPSPS–––SS'],['Sorcerer','S––SS––P–S–'],['Mutant Lord','–SS–P–––SPP'],['Mutant','––SSP–––SSP'],['Chosen','––S–SS–S–PS'],['Cultist','––S–P–S––SS'],['Acolyte','S––SP––––––'],['Chaos Spawn','––––P–––––P'],['Familiar','P––PS––––––'],['Daemon','–SS–P––––PP'],['Corrupted Ogryn','–PS–P–––S–S']],
+};
+['nurgle','tzeentch','slaanesh','undivided'].forEach(k=>SKT[k]=SKT[k].map(([n,r])=>[n,[...r]]));
+const D=()=>DED[G.ded]||DED.khorne;
+const ROWNAME={apostle:'Apostle',disciple:'Disciple',sorcerer:'Sorcerer',mutantlord:'Mutant Lord',mutant:'Mutant',chosen:'Chosen',cultist:'Cultist',acolyte:'Acolyte',ogryn:'Corrupted Ogryn',daemon:'Daemon'};
+const skillCols=()=>['Agility','Brawn','Combat','Cunning','Ferocity','Leadership','Shooting','Savant',D().god,'Heresy','Mutation'];
+function access(type){if(type==='scrunt')return{P:['Nothing'],S:['Nothing']};const row=(SKT[D().key]||KTABLE).find(r=>r[0]===ROWNAME[type]);const cols=skillCols(),P=[],S=[];if(row)row[1].forEach((v,i)=>{if(v==='P')P.push(cols[i]);if(v==='S')S.push(cols[i])});if(type==='sorcerer')P.push('Aetheric Wyrd Powers');return{P,S}}
+function undivOf(f){const lead=G.fighters.find(x=>x.type==='apostle');return (f.type==='daemon'?(lead&&lead.undiv):f.undiv)||'vicious'}
+function markMods(f){return D().key==='undivided'?UNDIV[undivOf(f)].mods:D().mods}
+const markName=()=>D().mark;
+function markSummary(f){const d=D();if(d.key==='undivided'){const u=UNDIV[undivOf(f)];return `${u.n}: ${u.t}`}return d.traits.map(t=>t[1]).join(', ')}
+function markText(f){const d=D();if(d.key==='undivided')return `Each marked fighter takes one trait: ${Object.values(UNDIV).map(u=>u.n+' ('+u.t+')').join('; ')}.${f?' This fighter: '+markSummary(f)+'.':''}`;return d.traits.map(t=>`${t[0]}: ${t[1]}.`).join(' ')+' Hatred (X): must re-roll failed wound rolls in melee against fighters with that Mark.'}
+function xpRule(){const d=D();return d.xp==='triple'?'If the Threshold roll has 3 or more dice showing the same value, the fighter gains +1 XP.':`If the Threshold roll totals ${d.xp[0]} or a multiple of ${d.xp[0]}, the fighter gains +${d.xp[1]} XP.`}
+function xpShort(){const d=D();return d.xp==='triple'?`${d.n}: 3+ matching dice = +1 XP`:`${d.n}: total of ${d.xp[0]}, ${d.xp[0]*2}, ${d.xp[0]*3}… = +${d.xp[1]} XP`}
+function xpBonus(dice,total){const d=D();if(d.xp==='triple'){const c={};dice.forEach(v=>c[v]=(c[v]||0)+1);return Object.values(c).some(n=>n>=3)?'Three of a kind: +1 XP to the invoking fighter':''}return total%d.xp[0]===0?`${d.n} is pleased: +${d.xp[1]} XP to the invoking fighter`:''}
+function daemonRepText(){const d=D();return d.rep?`${d.n} gangs need ${d.rep} Rep`:'Chaos Undivided gangs: the book says “3D3 +125” Rep – agree it with your Arbitrator'}
+DEDKEYS.forEach(k=>Object.defineProperty(RULES,DED[k].mark,{get(){return markText()},enumerable:true}));
+Object.defineProperty(RULES,'Mark of Chaos',{get(){return `Gains the Gang Leader's Mark: the ${markName()}.`}});
+Object.defineProperty(RULES,'Immaterial Member',{get(){return `Part of the gang once recruited, but only joins a battle when summoned by the Article “Call the Void”. Can't be recruited at gang creation; ${daemonRepText()}.`}});
+
+const COMMON_ARTS=[
+['Shred Them with the Howl of Empty Chambers',8,`One friendly fighter within 4" automatically reloads one out-of-ammo weapon, even a Scarce one.`,`The targeted fighter takes an automatic hit from their own out-of-ammo weapon.`,7],
+['Call the Void with Thine Heart, Flesh and Soul',12,`Deploy the friendly Daemon with a Ready marker within 4". The fighter may instead auto-pass by sacrificing themselves (Out of Action, roll injury as usual).`,`The fighter suffers D3+1 Flesh Wounds and their activation ends. The opponent deploys one of their Daemons (if able) with a Ready marker within 4".`,8],
+];
+const PATHS={
+destruction:{n:'Path of Destruction',blurb:`Fury and the red joy of slaughter. The tally of skulls is all that matters.`,benefit:`When generating Delusion Dice, each fighter Engaged with an enemy rolls an extra D6, and the gang rolls an extra D6 for each enemy taken Out of Action.`,arts:[
+['Contempt Shall Be My Shield!',6,`This fighter and all Chaos Cult fighters within 8" cannot be targeted by, and are immune to, Wyrd Powers and Articles of Damnation.`,`−1 Willpower for the rest of the battle.`],
+['Screech, His Gaze Did Seek Them!',5,`Attacks through smoke; ignores Pitch Black and Partial Cover. +1 to Initiative against Blind from Flash.`,`−1 Ballistic Skill for the rest of the battle.`],
+['His Roar Fell Upon Them…',5,`Every enemy within 8" with line of sight to this fighter must check Nerve.`,`This fighter must check Nerve.`],
+['And by Their Dishonour Shall They Be Known…',8,`One enemy Ganger within 16" with line of sight checks Leadership; if failed, they roll for Perils of the Warp.`,`No effect.`],
+['And a Wave of Gore Did Drown Them…',11,`In this round's End Phase, the enemy adds the number of their fighters Out of Action to their Bottle test.`,`D2 Flesh Wounds.`],
+['Upon a Citadel of Bone Shall My Strength Be Built!',6,`+1 Strength and Toughness per friendly Ganger that has gone Out of Action (max +3).`,`Strength and Toughness reduced to 1 for the rest of the battle.`],
+]},
+perversion:{n:'Path of Perversion',blurb:`Maddening sensation and wild impulse; violence for the experience of it.`,benefit:`When generating Delusion Dice, roll an extra D6 for every enemy fighter who has a Flesh Wound.`,arts:[
+['Lo, Did I Spread My Desires…',5,`When leaping a gap add +3D6" to movement; when jumping down count the distance as D6+2" less. Declare the move first.`,`Resolve the declared move without the benefit.`],
+['By Our Pain Shall She Feel Our Worth…',5,`+3 Toughness. When the Article expires, they suffer a Flesh Wound.`,`A Flesh Wound.`],
+['Without Thought, She Struck Them Down…',6,`A free Charge (Double) action, but −2 to hit for the rest of the round.`,`−2 to hit for the rest of the battle.`],
+['And Agony Brought the Unbelievers Low…',7,`Every enemy within 6" with a Flesh Wound and line of sight can only take one action this round.`,`This fighter can only take one action this round.`],
+['Each Blow Shall Barb My Enemy’s Flesh…',5,`An enemy declaring a close combat attack against this fighter checks Willpower at −2; if failed they take a Flesh Wound.`,`No effect.`],
+['He Gave Unto Them the God’s Pleasure…',5,`Declared when an enemy attempts Coup de Grace on a friendly Chaos Cult fighter: interrupt with a free Fight (Basic) action.`,`No effect.`],
+]},
+affliction:{n:'Path of Affliction',blurb:`The pure, self-hating malice of the Warp.`,benefit:`If the Gang Leader is Out of Action or the gang has failed a Bottle test, Delusion Dice are generated on 4+ instead of 5+.`,arts:[
+['And the Chattel Rose Up in Their Hordes…',8,`Forfeit both actions this round. Deploy D3 extra fighters on the nearest battlefield edge, at least 9" from enemies.`,`A random non-participating fighter is taken Captive by the enemy.`],
+['By the Manner of Their Demise Did the Warp Judge Them!',5,`Stand (if Pinned) and take a free Move. Then centre a Blast (5") on them: everything touched takes S6, AP −2, D2. The fighter goes Out of Action.`,`Resolve the blast before moving.`],
+['And in the Beauty of the Void, Even Death Was Defied!',8,`Serious Injury and Out of Action injury results count as No Effect. When the Article expires, the fighter goes Out of Action.`,`Gains the Insane condition.`],
+['And in Darkness They Tasted the Blind…',5,`This fighter and any within 9" can't shoot targets more than 3" away, or be shot from more than 3" away.`,`If they go Out of Action this game, they also suffer the Blinded Lasting Injury.`],
+['The Soul of the Faithless Was Easily Broken…',8,`One enemy within 12" with line of sight checks Intelligence at −1; if failed they lose Ready.`,`The fighter's activation ends.`],
+['Those of Simple Mind and Twisted Paw Shall Be Smote…',9,`Chaos Cult fighters within 6" with line of sight to this fighter (including them) re-roll failed hits against Brutes, Spawn, Exotic Beasts, pets, monsters, critters and mutated fighters.`,`The opponent resolves a Shoot action with this fighter against any target.`],
+]},
+degeneration:{n:'Path of Degeneration',blurb:`Slow rot of body and soul, with no release in death.`,benefit:`When generating Delusion Dice, roll an extra D6 for every friendly fighter who is Seriously Injured or Out of Action.`,arts:[
+['He Became Defiant Upon the Mountain…',5,`Not Pinned by ranged hits, but no partial cover benefit and can't Take Cover.`,`Becomes Concussed.`],
+['And Splinters Shall Purge Away Their Sin!',3,`Melee and Versatile weapons gain Flash and Rad-Phage.`,`Rolls an Injury die on themselves.`],
+['With Iron Fangs, Shall They Be Consumed…',5,`May re-roll Wound rolls with chain weapons.`,`No effect.`],
+['His Feet Dragged Him Into the Fray…',3,`A free Move (Simple), but suffers a Flesh Wound.`,`A Flesh Wound.`],
+['In His Gaze, They Were Found Febrile…',7,`Torment (Basic): an enemy within 7" checks Willpower; if failed they can't act in their next activation.`,`No effect.`],
+['Even Death Could Not Stay His Righteous Wrath!',7,`If this fighter goes Out of Action, an enemy of your choice within 7" and line of sight takes S5, AP −1, D2.`,`The opponent picks the target.`],
+]},
+vacillation:{n:'Path of Vacillation',blurb:`Chaos in its purest form, hungering for the end of all order.`,benefit:`When generating Delusion Dice, the Gang Leader and each Champion roll an extra D6.`,arts:[
+['By the Manner of Their Demise Did the Warp Judge Them!',5,`Stand (if Pinned) and take a free Move. Then centre a Blast (5") on them: everything touched takes S6, AP −2, D2. The fighter goes Out of Action.`,`Resolve the blast before moving.`],
+['His Feet Dragged Him Into the Fray…',3,`A free Move (Simple), but suffers a Flesh Wound.`,`A Flesh Wound.`],
+['Screech, His Gaze Did Seek Them!',5,`Attacks through smoke; ignores Pitch Black and Partial Cover. +1 to Initiative against Blind from Flash.`,`−1 Ballistic Skill for the rest of the battle.`],
+['And Agony Brought the Unbelievers Low…',7,`Every enemy within 6" with a Flesh Wound and line of sight can only take one action this round.`,`This fighter can only take one action this round.`],
+['Thine Gaze Shall Lash My Enemy’s Fingers…',5,`An enemy declaring a ranged attack against this fighter checks Leadership; if failed they take a Flesh Wound and must pick another target.`,`No effect.`],
+['Look Upon Thy Works Ye Mighty and Despair',5,`One ranged weapon gains Fear and Gas.`,`The fighter counts as hit by a weapon with the Cursed trait.`],
+]},
+};
+const PATHKEYS=['destruction','perversion','affliction','degeneration','vacillation'];
+function pathArts(p){const P=PATHS[p];return P.arts.map((a,i)=>({id:p+i,num:i+1,n:a[0],t:a[1],pass:a[2],fail:a[3]})).concat(COMMON_ARTS.map((a,i)=>({id:'c'+i,num:a[4],n:a[0],t:a[1],pass:a[2],fail:a[3]})));}
+
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SP={
+S:{suit:'Spades',sym:'♠',theme:'Blood',reward:'Reputation',c:[
+['Down with the Imperium!',`A fighter in the enemy deployment zone can take Defile the Aquila (Double). Reveal on the first. After three, gain D3+1 Rep.`],
+['The Eight-Pointed Star',`A fighter in the enemy deployment zone can take Spraypaint Profane Icon (Double). Reveal on the first. After three, gain D3+1 Rep.`],
+['Heretek’s Blessing',`Reveal at the start. A random fighter's chosen weapon gains +1 Strength and Damage for the battle. Win: +D3 Rep.`],
+['Everything Ends in Chaos',`Reveal at the start. Zone Mortalis: destroy three doors. Sector Mechanicus: destroy a ~6" terrain piece (T8, W8, hit automatically). Succeed: +D3 Rep.`],
+['Blood and Skulls',`Reveal at the end if at least five enemies went Out of Action (Bottled fighters who fled don't count). Gain +D3+1 Rep.`],
+['A Dark Invitation',`Reveal at the start; randomly choose an enemy. A fighter in base contact can take Plant Heretical Pamphlet (Basic): +D3 Rep, plus +D3 if that enemy ends neither Seriously Injured nor Out of Action.`],
+['Sacred Spaces',`Reveal at the start. Choose terrain at least 12" from your deployment zone. No enemies within 6" of it at the end: +D3 Rep.`],
+['The Unstoppable March',`Reveal at the end. Four or more of your fighters in the enemy deployment zone: +D6 Rep.`],
+['A Prime Offering',`Reveal when you take an enemy Leader or Champion Out of Action. If the enemy has no Leader or Champions in play at the end: +D6 Rep.`],
+['Fall into Darkness',`Reveal when you knock an enemy down a Pitfall or they fall Out of Action. +D3 Rep, plus +D3 if three enemies go Out of Action this way.`],
+['Ritualistic Takedown',`Reveal when you take an enemy Out of Action with an unarmed attack. +D3 Rep, or +D6 for a Leader or Champion.`],
+['Purge the Weak',`Reveal when the last enemy Juve goes Out of Action (no Juves: their three lowest-value fighters). +D6 Rep.`],
+['Glory to the Gods',`Reveal at the end if you won within ten rounds: +D6 Rep, or +2D6 within five rounds.`]]},
+H:{suit:'Hearts',sym:'♥',theme:'Change',reward:'Credits',c:[
+['Marked for Death',`Reveal after crews, before deployment. Randomly choose an enemy. Out of Action at the end: D6×10 credits, or 2D6×10 if by Coup de Grace or a Melee weapon.`],
+['Chosen',`Reveal at the start; pick one of your Juves (or a Ganger). Loses no Wounds: 10 credits, or D6×10 if they also wounded an enemy.`],
+['Find the Message',`A fighter within 3" of a Ductway (ZM) or on an upper level (SM) can take Search for Message (Double): on 5+ gain 2D6×10 credits; the last unsearched spot succeeds automatically. Win: +D3 Rep.`],
+['Toy with Them',`When you hit the enemy Gang Leader in close combat, you may reveal to end the attack with no effect. Gain D6×10 credits, or 2D6×10 if your Leader did it.`],
+['Dark Amusements',`Reveal once two enemies have become Broken. D3×10 credits, or D6×10 for three or more.`],
+['Unholy Derangement',`Reveal at the start. Your fighters reduce cover benefits by 1. Win: 2D6×10 credits, or 3D6×10 with none of yours Out of Action.`],
+['Lord of Change',`A fighter in base contact with an enemy can take Shakedown (Basic): D3×10 credits, or D6×10 against a Leader or Champion. Reveal on the first.`],
+['Two for One',`Reveal when an enemy goes Out of Action from another fighter falling on them. 2D6×10 credits, or 3D6×10 for a Leader or Champion.`],
+['Shower of Gore',`Reveal when an attack rolls 3+ Injury dice and at least one is Out of Action. D6×10 credits.`],
+['Back-Alley Murder',`Reveal when you take an enemy Out of Action with no enemy line of sight to either fighter. D3×10 credits, or D6×10 with a Melee weapon.`],
+['Announce Your Presence',`Reveal at the end of a round where the gang fired five or more Blast, Rapid Fire or Blaze weapons without causing a Wound. 2D6×10 credits.`],
+['The Hunt Is On',`Reveal at the start; choose a random enemy. A fighter within 12" can take Shadow (Double): when the target next moves, follow them; lost if more than 12" away. A Shadowing fighter at the end: +D6 Rep.`],
+['Violent Delights',`Reveal at the end. D3×10 credits per fighter (either side) Out of Action without a Memorable Death, or D6×10 for each Critical Injury (61–65).`]]},
+C:{suit:'Clubs',sym:'♣',theme:'Rot',reward:'XP',c:[
+['A Touch of Madness',`Reveal at the start of round one. Leader's leadership range drops to 6"; fighters out of sight of a friend get −1 Leadership and Cool. Win: participants gain +D3 XP.`],
+['Hurt and Angry',`Reveal at the start. A random fighter gets −1 M, WS, BS and S. Not Seriously Injured or Out of Action at the end: +D6 XP.`],
+['Undying Legions of Chaos',`Reveal before Priority in round one. Add D3 random non-participating fighters to your deployment zone. Lose: no XP except for taking enemies Out of Action.`],
+['Loaded with Ammo',`Reveal at the start. Re-roll failed Ammo checks, but ranged attacks against you get +1 Damage. Fighters not Out of Action at the end: +D3 XP.`],
+['Angered Patron',`Reveal at the start. All fighters −2 Cool. Win: participants +D3 XP, or +D6 with none Out of Action.`],
+['Foes Close In',`Reveal before deployment. You deploy first; the opponent has Priority in round one and +1 to Priority every round. Fighters not Out of Action: +D3 XP.`],
+['The Liar’s Skin',`Reveal when your first Ganger goes Out of Action: instead they return at full Wounds as an enemy infiltrator. Whoever takes them out again gains +D6 XP; no Lasting Injury roll.`],
+['Stain the Ground Red',`Reveal on your first Coup de Grace. Each fighter who takes a Coup de Grace gains +1 XP (once each).`],
+['Lost in Delusion',`Reveal when you first activate a Leader or Champion; they can't Group Activate. Not Out of Action at the end: +D3 XP (Champion) or +D6 (Leader).`],
+['Chaos Is Forever',`Reveal when a fighter enters base contact with two or more enemies. +D3 XP, or +D6 if they take all of them Out of Action that activation.`],
+['Fear of Consequence',`Reveal on your first successful Rally. Each fighter who Rallies gains +2 XP instead of +1 (once each).`],
+['Fearless in the Face',`Reveal the first time a fighter leaps a Pitfall, leaps a gap wider than their base, or survives a fall or hazard. Each who does so gains +1 XP (once each).`],
+['Temporarily Inured',`Reveal on the gang's first Flesh Wound. Flesh Wounds now count as No Effect, but Lasting Injury is rolled twice, taking the worse. Fighters not SI/OOA at the end: +D3 XP.`]]},
+D:{suit:'Diamonds',sym:'♦',theme:'Perversion',reward:'Gang Tactics',c:[
+['Kill! Maim! Burn!',`Reveal at the end of a round with three or more enemies Seriously Injured or Out of Action. +1 random Gang Tactic.`],
+['Random Violence',`Reveal when you take an enemy Out of Action in melee, out of line of sight and more than 12" from other enemies. +1 random Gang Tactic.`],
+['The Fate of All Flesh',`Reveal when at least half the enemy gang is Seriously Injured, Out of Action or removed. +1 random Gang Tactic.`],
+['Weakling Minds',`Reveal when an enemy fails a Willpower check by rolling 10+. +1 random Gang Tactic.`],
+['Heretekal Works',`Reveal at the start. Choose three door consoles or terrain pieces at least 6" from your zone and 8" apart. Within 1", Upload Heretek Code (Double): pass Intelligence for +1 Gang Tactic of your choice (once per game).`],
+['Cover Up',`Reveal on your first Melee or Coup de Grace Out of Action. D6: on 6+ gain +1 Gang Tactic of your choice; each later roll adds +1.`],
+['Bow Before Chaos',`Reveal at the end of a round with three or more enemies Prone. +1 random Gang Tactic.`],
+['For Unknown Purposes',`A fighter within 6" of the enemy Leader takes Pict-Capture (Double) and gains Carrying Evidence. Returning to your deployment zone removes them (not counted for Bottle tests): +3 Gang Tactics of your choice.`],
+['Bringer of Doom',`Reveal at the start; pick a random bomb carrier. Within 6" of the centre, Plant Bomb (Simple). After three: +1 Gang Tactic of your choice. If they go OOA first, Blast (5") on them: S3, AP 0, D1, Knockback.`],
+['Not Here for You',`In base contact with an enemy Ganger or Juve, Bribe (Basic): if they fail Willpower, their gang gains D3×10 credits and they are removed (not counted for Bottle tests). Repeatable.`],
+['Incriminating Packet',`Reveal at the start; pick a random courier. At the end of any round with them in the enemy deployment zone, remove them (not counted for Bottle tests): +2 Gang Tactics of your choice.`],
+['Underhive Altar',`Reveal at the start. Choose a point at least 12" from your zone. Two or more Seriously Injured fighters within 6" of it: +1 Gang Tactic of your choice.`],
+['The Rot Within',`Reveal at the start. A random fighter carries an infection. If the enemy takes them OOA with a Melee weapon: +1 random Gang Tactic (your choice if a Leader or Champion).`]]},
+};
+
+
+/* Lasting Injuries (current Necromunda table, D66) and campaign status */
+const LI=[
+{lo:11,hi:11,r:'11',n:'Lesson Learned',st:'recovery',xp:'D3',t:`Goes into Recovery, but gains D3 XP.`},
+{lo:12,hi:26,r:'12–26',n:'Out Cold',st:'',t:`Misses the rest of the battle. No lasting effect.`},
+{lo:31,hi:45,r:'31–45',n:'Grievous Wound',st:'recovery',t:`Goes into Recovery.`},
+{lo:46,hi:46,r:'46',n:'Humiliated',st:'recovery',perm:1,mods:{Ld:1,Cl:1},t:`Goes into Recovery. −1 Leadership and −1 Cool.`},
+{lo:51,hi:51,r:'51',n:'Head Injury',st:'recovery',perm:1,mods:{Int:1,WP:1},t:`Goes into Recovery. −1 Intelligence and −1 Willpower.`},
+{lo:52,hi:52,r:'52',n:'Eye Injury',st:'recovery',perm:1,mods:{BS:1},t:`Goes into Recovery. −1 Ballistic Skill.`},
+{lo:53,hi:53,r:'53',n:'Hand Injury',st:'recovery',perm:1,mods:{WS:1},t:`Goes into Recovery. −1 Weapon Skill.`},
+{lo:54,hi:54,r:'54',n:'Hobbled',st:'recovery',perm:1,mods:{M:-1},t:`Goes into Recovery. −1 Movement.`},
+{lo:55,hi:55,r:'55',n:'Spinal Injury',st:'recovery',perm:1,mods:{S:-1},t:`Goes into Recovery. −1 Strength.`},
+{lo:56,hi:56,r:'56',n:'Enfeebled',st:'recovery',perm:1,mods:{T:-1},t:`Goes into Recovery. −1 Toughness.`},
+{lo:61,hi:65,r:'61–65',n:'Critical Injury',st:'critical',t:`In critical condition: dies after the battle unless a Doc treats them (Medical Escort post-battle action).`},
+{lo:66,hi:66,r:'66',n:'Memorable Death',st:'dead',t:`Killed outright. If an enemy attack caused it, that attacker gains 1 extra XP.`},
+];
+const LIP={};LI.filter(x=>x.perm).forEach(x=>LIP[x.n]=x);
+const CSTAT=[['active','Active'],['recovery','In Recovery'],['critical','Critical (needs a Doc)'],['captured','Captured'],['dead','Dead']];
+const cstat=f=>f.status||'active';
+const alive=()=>G.fighters.filter(f=>cstat(f)!=='dead');
+function rollLI(f){const a=d6(),b=d6(),v=a*10+b;const r=LI.find(x=>v>=x.lo&&v<=x.hi);const T=FT[f.type];const nm=f.name||T.n;let note='';
+ const immune=['daemon','scrunt'].includes(f.type);
+ if(immune&&r.n!=='Memorable Death'){note=f.type==='scrunt'?'Nobody could be bothered to hurt him properly – no effect.':'Warp Denizen – ignores every Lasting Injury except Memorable Death.';return{v,r,nm,note,applied:false}}
+ if(f.type==='apostle'&&r.n==='Memorable Death'){const pool=alive().filter(x=>x.uid!==f.uid);const sac=pool[Math.floor(Math.random()*pool.length)];
+  if(sac){sac.status='dead';f.injuries=(f.injuries||[]).concat('Enfeebled');f.muts=f.muts||[];if(!f.muts.includes('Crooked Body'))f.muts.push('Crooked Body');f.status='recovery';
+   note=`Amaranthine: ${sac.name||FT[sac.type].n} dies in the Apostle's place. The Apostle takes Enfeebled and the Crooked Body Mutation.`;return{v,r,nm,note,applied:true}}}
+ if(r.st)f.status=r.st;if(r.perm)f.injuries=(f.injuries||[]).concat(r.n);
+ if(r.xp){const x=1+Math.floor(Math.random()*3);f.xp=(+f.xp||0)+x;note=`+${x} XP.`}
+ if(r.n==='Memorable Death'&&f.type==='apostle')note='No other fighter left to sacrifice.';
+ return{v,r,nm,note,applied:true}}
+function liResult(x){if(!x)return '';return `<div class="result ${['dead','critical'].includes(x.r.st)?'fail':x.r.st?'':'pass'}"><div class="dice"><span class="die hit">${String(x.v)[0]}</span><span class="die hit">${String(x.v)[1]}</span></div><p><strong>${x.v} – ${esc(x.r.n)}</strong> for ${esc(x.nm)}: ${esc(x.r.t)}</p>${x.note?`<p>${esc(x.note)}</p>`:''}</div>`}
+let lastLI={};
+
+/* ============================== STATE ============================== */
+const LS={get(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let uidN=Date.now()%100000;const uid=()=>'f'+(uidN++).toString(36);
+function F(type,name,items=[],muts=[],extra={}){return Object.assign({uid:uid(),type,name,items,muts,skills:'',open:false},extra)}
+function exampleGang(){return{example:true,ded:'khorne',name:'The Brass Tithe',path:'destruction',budget:1000,rep:0,founding:true,fighters:[
+ F('apostle','Vorgan the Unbowed',['Chainaxe','Bolt Pistol','Flak Armour'],[],{skills:'Frenzy',open:true}),
+ F('disciple','Skarl Red-Hand',['Greatsword','Laspistol','Flak Armour'],[],{skills:'Nerves of Steel'}),
+ F('mutantlord','The Hollow Butcher',['Two-Handed Axe'],['Scaly Skin','Vast Bulk'],{skills:'Killing Blow'}),
+ F('chosen','Ashe',['Chainsword','Stub Gun']),
+ F('chosen','Brother Gorrow',['Axe','Cleaver']),
+ F('mutant','Gutcleft',['Heavy Club','Flak Armour'],['Massive Claws']),
+ F('mutant','Wretch',['Axe','Sawn-Off Shotgun'],['Tentacles']),
+ F('cultist','Pyre-Sister Vell',['Flamer'],[],{spec:true}),
+ F('cultist','Murk',['Autogun']),
+ F('acolyte','Tallow',['Fighting Knife','Stub Gun']),
+]}}
+let G=LS.get('ss-gang',null)||exampleGang();
+let B=LS.get('ss-battle',{round:1,pool:0,used:{},fs:{},enemyOOA:0,enemyFW:0,bottled:false,last:null,art:null});
+let DK=LS.get('ss-deck',{removed:[],hand:[],note:''});
+let UI=LS.get('ss-ui',{play:'battle',rules:''});
+const save=()=>{LS.set('ss-gang',G)},saveB=()=>LS.set('ss-battle',B),saveD=()=>LS.set('ss-deck',DK),saveUI=()=>LS.set('ss-ui',UI);
+
+/* ============================== HELPERS ============================== */
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const d6=()=>1+Math.floor(Math.random()*6);
+const fmt=(k,v)=>k==='M'?v+'"':TN.has(k)?v+'+':String(v);
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,1800)}
+function stats(f){const T=FT[f.type];const o={};STATK.forEach((k,i)=>o[k]=T.st[i]);
+ if(T.mark){Object.entries(markMods(f)).forEach(([k,v])=>{o[k]+=v})}
+ (f.injuries||[]).forEach(n=>{const L=LIP[n];if(L)Object.entries(L.mods).forEach(([k,v])=>{o[k]+=v})});
+ STATK.forEach(k=>{o[k]=TN.has(k)?Math.min(12,Math.max(2,o[k])):Math.max(k==='A'||k==='M'?1:0,o[k])});
+ (f.muts||[]).forEach(m=>{if(m==='Vast Bulk')o.W++;if(m==='Extra Appendages')o.A++});return o}
+function baseStats(type){const o={};STATK.forEach((k,i)=>o[k]=FT[type].st[i]);return o}
+function cost(f){const T=FT[f.type];let c=T.cost;(f.items||[]).forEach(n=>c+=EQ[n]?EQ[n].c:0);(f.muts||[]).forEach(n=>c+=MUTS[n]?MUTS[n].c:0);
+ if(T.wyrd)c+=Math.max(0,(f.wyrd||[]).length-1)*30;if(f.psyker)c+=30;
+ if(f.type==='ogryn'){(f.hands||[]).forEach(h=>c+=h==='Power Maul'?30:h==='Horrific Appendages'?20:0);if(f.plate)c+=15}
+ return c}
+const gangCost=()=>alive().reduce((s,f)=>s+cost(f),0);
+function itemCount(n){let k=0;G.fighters.forEach(f=>(f.items||[]).forEach(i=>{if(i===n)k++}));return k}
+function weaponsOf(f){const out=[];
+ if(f.type==='ogryn'){(f.hands||['Open Fist','Open Fist']).forEach(h=>out.push([h,WP[h]]))}
+ if(f.type==='daemon'){out.push(['Vorpal Claws',WP['Vorpal Claws']],['Warpfire Breath',WP['Warpfire Breath']])}
+ if(f.type==='scrunt'){out.push(['Sharpened Spoon',WP['Sharpened Spoon']])}
+ (f.items||[]).forEach(n=>{const e=EQ[n];if(e&&e.p&&e.p.length)e.p.forEach(p=>out.push([p,WP[p]]))});
+ const seen=new Set();return out.filter(([n])=>{if(n==='Polearm'&&seen.has(n))return false;seen.add(n);return true})}
+function gearOf(f){return (f.items||[]).filter(n=>EQ[n]&&!(EQ[n].p&&EQ[n].p.length))}
+function wtable(rows,note){if(!rows.length)return '<p class="muted">Unarmed only.</p>';
+ return `<div class="scroll"><table class="wtab"><thead><tr><th>Weapon</th><th>S</th><th>L</th><th>S</th><th>L</th><th>Str</th><th>AP</th><th>D</th><th>Am</th><th>Traits</th></tr></thead><tbody>${rows.map(([n,p])=>`<tr><td>${esc(n)}</td>${p.slice(0,8).map(v=>`<td class="n">${esc(v)}</td>`).join('')}<td class="tr">${esc(p[8])}</td></tr>`).join('')}</tbody></table></div>`}
+function statTable(o,base,hurt={}){return `<div class="scroll"><table class="stats"><thead><tr>${STATK.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody><tr>${STATK.map(k=>{let v=o[k];let cls=base&&base[k]!==o[k]?'mod':'';if(hurt[k]!=null){v=hurt[k];cls='hurt'}return `<td class="${cls}">${fmt(k,v)}</td>`}).join('')}</tr></tbody></table></div>`}
+function ruleDetails(names){return `<div class="rules-list">${names.map(n=>`<details class="rd"><summary>${esc(n)}</summary><p>${esc(RULES[n]||'')}</p></details>`).join('')}</div>`}
+
+/* ============================== VALIDATION ============================== */
+function validate(){const I=[];const fs=alive();const cnt=t=>fs.filter(f=>f.type===t).length;
+ const ap=cnt('apostle');if(ap!==1)I.push(['err',ap?'Only one Apostle allowed.':'The gang needs an Apostle (Gang Leader).']);
+ const hier=fs.filter(f=>FT[f.type].hier).length,gf=fs.filter(f=>FT[f.type].gf).length,champs=fs.filter(f=>FT[f.type].champ).length;
+ if(hier>gf)I.push(['err',`Leader and Champions (${hier}) outnumber Gang Fighters (${gf}).`]);
+ if(G.founding&&champs>2)I.push(['err',`Only 2 Champions at founding (you have ${champs}).`]);
+ ALLORDER.forEach(t=>{const T=FT[t];if(T.max<99&&cnt(t)>T.max)I.push(['err',`${T.n}: limit ${T.max} (you have ${cnt(t)}).`])});
+ const total=gangCost();if(total>G.budget)I.push(['err',`Over budget by ${total-G.budget} credits.`]);
+ if(G.founding){const spec=fs.filter(f=>f.spec).length;if(spec>1)I.push(['err',`Only one Specialist at founding (you have ${spec}).`])}
+ if(cnt('daemon')){if(G.founding)I.push(['err','The Daemon cannot be recruited at gang creation.']);if(D().rep&&G.rep<D().rep)I.push(['err',`A ${D().n} Daemon needs ${D().rep} Rep.`]);if(!D().rep)I.push(['warn','Daemon Rep for Chaos Undivided is unclear in the book (“3D3 +125”) – agree it with your Arbitrator.'])}
+ const brutes=fs.filter(f=>FT[f.type].brute).length,maxB=1+Math.floor(Math.max(0,G.rep)/5);if(brutes>maxB)I.push(['err',`Rep ${G.rep} allows ${maxB} Brute/Hanger-On; you have ${brutes}.`]);
+ const seen={};fs.forEach(f=>(f.items||[]).forEach(n=>seen[n]=(seen[n]||0)+1));
+ Object.entries(seen).forEach(([n,k])=>{const e=EQ[n];if(!e)return;if(e.lim&&k>e.lim)I.push(['err',`${n}: gang limit ${e.lim} (you have ${k}).`]);if(e.rep&&G.rep<e.rep)I.push(['warn',`${n} needs Rep ${e.rep}.`])});
+ fs.forEach(f=>{const T=FT[f.type],nm=f.name||T.n;const m=(f.muts||[]).length,st=stats(f);
+  if(G.founding&&(m<T.mut[0]||m>T.mut[1])&&(T.mut[1]||m))I.push(['err',`${nm}: ${T.mut[0]===T.mut[1]?'no':T.mut[0]+'–'+T.mut[1]} Mutations at recruitment (has ${m}).`]);
+  if(m>st.T)I.push(['err',`${nm} has more Mutations than Toughness – they become a Chaos Spawn.`]);
+  if(m===st.T&&m)I.push(['warn',`${nm} is one Mutation from becoming a Chaos Spawn.`]);
+  if((f.items||[]).filter(n=>n==='Familiar').length>1)I.push(['err',`${nm}: max 1 Familiar per fighter.`]);
+  if(f.type==='mutant'&&!f.spec&&(f.items||[]).some(n=>EQ[n]&&EQ[n].cat==='special'))I.push(['warn',`${nm}: only a Mutant Specialist can use Special Weapons.`]);
+  if(f.type==='cultist'&&!f.spec&&(f.items||[]).some(n=>EQ[n]&&['special','heavy'].includes(EQ[n].cat)))I.push(['warn',`${nm}: only a Cultist Specialist can use Special and Heavy Weapons.`]);
+  if(T.wyrd&&!(f.wyrd||[]).length)I.push(['warn',`${nm}: pick a free Wyrd Power.`]);
+  if(T.free&&!f.skills)I.push(['warn',`${nm}: pick a free Primary skill.`]);
+  if((f.muts||[]).includes('Crooked Body')&&(f.items||[]).some(n=>EQ[n]&&EQ[n].cat==='armour'))I.push(['warn',`${nm}: Crooked Body can't wear armour.`]);
+  if(f.psyker&&f.type==='apostle'&&G.rep<10)I.push(['err',`Psyker Apostle needs 10 Rep.`]);
+ });
+ if(!I.length)I.push(['ok','Roster is legal.']);return I}
+
+/* ============================== ROUTER ============================== */
+const app=document.getElementById('app');
+function applyDed(){document.documentElement.dataset.ded=D().key;const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||tc.content;const sm=document.querySelector('.brand small');if(sm)sm.textContent='Chaos Cult · '+D().n}
+function route(){applyDed();const h=(location.hash||'#build').slice(1);
+ let r='build',sub='';if(h==='play')r='play';else if(h==='rules'||h.startsWith('rules-')){r='rules';sub=h.slice(6)}else if(h==='pick')r='pick';
+ document.querySelectorAll('.tabs a').forEach(a=>a.setAttribute('aria-current',(a.dataset.route===r||(r==='pick'&&a.dataset.route==='build'))?'page':'false'));
+ if(r==='pick'){if(!UI.pick||!byUid(UI.pick.uid)){location.hash='#build';return}renderPick();return}
+ if(r==='build'){renderBuild();if(UI.scrollTo){const u=UI.scrollTo;UI.scrollTo=null;saveUI();requestAnimationFrame(()=>document.querySelector(`[data-uid="${u}"]`)?.scrollIntoView({block:'start'}))}}else if(r==='play')renderPlay();else renderRules(sub);}
+window.addEventListener('hashchange',()=>{window.scrollTo(0,0);route()});
+
+/* ============================== BUILDER ============================== */
+let confirmKey=null;
+function renderBuild(){const total=gangCost(),I=validate(),pct=Math.min(100,total/Math.max(1,G.budget)*100);
+ const counts={};alive().forEach(f=>counts[f.type]=(counts[f.type]||0)+1);
+ app.innerHTML=`<div class="builder">
+ <aside class="rail">
+  <section class="panel stack" aria-label="Gang settings">
+   <div class="row" style="justify-content:space-between"><span class="label">Gang</span><button class="cog ${UI.cog?'on':''}" data-act="cog" aria-label="Roster settings" aria-expanded="${!!UI.cog}" title="Roster settings"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+   ${G.example?`<p class="pill brass">Example gang – edit it or start fresh</p>`:''}
+   <div class="field"><label class="label" for="g-name">Gang name</label><input type="text" id="g-name" value="${esc(G.name)}"></div>
+   <div class="field"><label class="label" for="g-ded">Unholy Dedication</label><select id="g-ded">${DEDKEYS.map(k=>`<option value="${k}" ${D().key===k?'selected':''}>${DED[k].n} – ${DED[k].title}</option>`).join('')}</select></div>
+   <div class="field"><label class="label" for="g-path">Path of Damnation</label><select id="g-path">${PATHKEYS.map(k=>`<option value="${k}" ${G.path===k?'selected':''}>${PATHS[k].n}</option>`).join('')}</select></div>
+   <div class="row"><div class="field" style="flex:1"><label class="label" for="g-budget">Credits</label><input type="number" id="g-budget" min="0" step="5" value="${G.budget}"></div>
+   <div class="field" style="flex:1"><label class="label" for="g-rep">Reputation</label><input type="number" id="g-rep" min="0" value="${G.rep}"></div></div>
+   <label class="check"><input type="checkbox" id="g-found" ${G.founding?'checked':''}> Founding roster (creation limits apply)</label>
+  </section>
+  <section class="panel stack" aria-label="Summary">
+   <div class="row" style="justify-content:space-between;align-items:baseline"><span class="label">Spent</span><span><span class="big">${total}</span> <span class="muted num">/ ${G.budget}</span></span></div>
+   <div class="budget ${total>G.budget?'over':''}"><i style="width:${pct}%"></i></div>
+   <div class="row muted" style="font-size:.88rem"><span>${G.fighters.length} fighters</span><span>·</span><span>${G.budget-total>=0?(G.budget-total)+' credits left':'over budget'}</span></div>
+   <ul class="issues">${I.map(([l,m])=>`<li class="${l}">${esc(m)}</li>`).join('')}</ul>
+  </section>
+  <section class="panel stack" aria-label="Recruit">
+   <span class="label">Recruit</span>
+   ${(()=>{const avail=ORDERF().filter(t=>!(FT[t].max<99&&(counts[t]||0)>=FT[t].max));const cur=avail.includes(UI.addSel)?UI.addSel:avail[0];
+    const GR=[['Leader',['apostle']],['Champions',['disciple','sorcerer','mutantlord']],['Gangers',['mutant','chosen','cultist','acolyte']],['Brutes',['ogryn','daemon']],['Legend',['scrunt']]];
+    return `<div class="recruit row"><select id="add-sel" aria-label="Fighter to recruit" style="flex:1;min-width:0">${GR.map(([g,ts])=>{const o=ts.filter(t=>ORDERF().includes(t));return o.length?`<optgroup label="${g}">${o.map(t=>{const T=FT[t],c=counts[t]||0,full=T.max<99&&c>=T.max;return `<option value="${t}" ${t===cur?'selected':''} ${full?'disabled':''}>${T.n} – ${T.cost} cr${T.max<99?` (${c}/${T.max})`:c?` (${c})`:''}${full?' – full':''}</option>`}).join('')}</optgroup>`:''}).join('')}</select><button class="btn primary" data-act="addsel" ${cur?'':'disabled'}>Add</button></div>`})()}
+  </section>
+  <section class="panel stack" aria-label="Roster tools" ${UI.cog?'':'hidden'}>
+   <div class="row" style="justify-content:space-between"><span class="label">Roster settings</span><button class="btn small ghost" data-act="cog">Close</button></div>
+   <div class="row"><button class="btn small" data-act="copytext">Copy as text</button><button class="btn small" data-act="expand">Expand all</button><button class="btn small" data-act="collapse">Collapse all</button></div>
+   <div class="row">${confirmKey==='new'?`<span class="confirm">Clear every fighter? <button class="btn small danger" data-act="new-yes">Clear</button><button class="btn small" data-act="cancel">Keep</button></span>`:`<button class="btn small" data-act="new">New empty gang</button><button class="btn small" data-act="example">Load example</button>`}</div>
+   <details class="rd"><summary>Back up or move this gang</summary><div class="t stack"><p class="muted" style="font-size:.85rem">The roster saves in this browser. Copy this code to keep a backup or open the gang on another device.</p><textarea id="io" rows="5">${esc(JSON.stringify(G))}</textarea><div class="row"><button class="btn small" data-act="copyjson">Copy code</button><button class="btn small" data-act="import">Load pasted code</button></div></div></details>
+  </section>
+ </aside>
+ <section class="cards" aria-label="Fighters">${G.fighters.length?G.fighters.map(cardEdit).join(''):`<div class="panel"><h3>No fighters yet</h3><p class="muted">Recruit an Apostle first, then add Champions and Gangers from the Recruit panel.</p></div>`}</section>
+ </div>`}
+
+function optList(f){const T=FT[f.type];if(!T.code)return '';return CATS.map(([cat,lab])=>{const items=EQL.filter(e=>e[2]===cat&&e[3].includes(T.code));if(!items.length)return '';
+ return `<optgroup label="${lab}">${items.map(e=>{const E=EQ[e[0]],k=itemCount(E.n),full=E.lim&&k>=E.lim,lowrep=E.rep&&G.rep<E.rep;
+  return `<option value="${esc(E.n)}" ${full||lowrep?'disabled':''}>${esc(E.n)} – ${E.c}${E.lim?` · 0-${E.lim}${full?' (taken)':''}`:''}${E.rep?` · Rep ${E.rep}`:''}</option>`}).join('')}</optgroup>`}).join('')}
+
+function cardEdit(f){const T=FT[f.type],st=stats(f),c=cost(f),k=f.uid;
+ const muts=f.muts||[];const AC=access(f.type);const canMut=f.type!=='scrunt'&&(T.mut[1]>0||!G.founding&&(AC.P.includes('Mutation')||AC.S.includes('Mutation')));
+ const rules=T.rules.slice();if(T.mark)rules.push(markName());
+ const gear=gearOf(f);
+ const CS=cstat(f);return `<article class="fc ${f.open?'open':''} ${f.type==='apostle'?'leader':''} ${CS==='dead'?'dead':''}" data-uid="${k}">
+ <div class="fch" data-toggle="${k}" role="button" tabindex="0" aria-expanded="${!!f.open}">
+  <span class="chev" aria-hidden="true">▸</span>
+  <div style="min-width:0"><div class="nm">${esc(f.name||T.n)}</div><div class="ty">${T.n} · ${T.role}${f.spec?' · Specialist':''}${muts.length?` · ${muts.length} mutation${muts.length>1?'s':''}`:''}</div></div>
+  ${CS!=='active'?`<span class="pill ${CS==='dead'||CS==='critical'?'blood':'brass'}">${esc(CSTAT.find(x=>x[0]===CS)[1])}</span>`:''}${(f.injuries||[]).length?`<span class="pill" title="${esc(f.injuries.join(', '))}">${f.injuries.length} injur${f.injuries.length>1?'ies':'y'}</span>`:''}
+  <span class="cost">${CS==='dead'?'–':c+' cr'}</span>
+ </div>
+ ${f.open?`<div class="fcb">
+  <div class="row"><div class="field" style="flex:1"><label class="label" for="nm-${k}">Name</label><input type="text" id="nm-${k}" data-name="${k}" value="${esc(f.name)}" placeholder="${T.n}"></div></div>
+  ${statTable(st,baseStats(f.type))}
+  ${T.mark?`<p class="muted" style="font-size:.82rem">${esc(markName())} applied – ${esc(markSummary(f))}. Changed values shown in colour.</p>${D().key==='undivided'&&f.type!=='daemon'?`<div class="field"><label class="label" for="ud-${k}">Undivided trait</label><select id="ud-${k}" data-undiv="${k}">${Object.entries(UNDIV).map(([u,U])=>`<option value="${u}" ${undivOf(f)===u?'selected':''}>${U.n} – ${U.t}</option>`).join('')}</select></div>`:''}`:''}
+  ${wtable(weaponsOf(f))}
+  ${T.code?`<div class="sub"><span class="label">Equipment</span><p class="muted" style="font-size:.82rem">${esc(T.equip)} All ranged weapons count as Scarce.</p>
+   <div class="chips">${(f.items||[]).map((n,i)=>`<span class="chip">${esc(n)} <b>${EQ[n]?EQ[n].c:''}</b><button aria-label="Remove ${esc(n)}" data-rmitem="${k}" data-i="${i}">×</button></span>`).join('')||'<span class="muted">Nothing yet.</span>'}</div>
+   <div class="row"><button class="btn small primary" data-pick="${k}" data-kind="equip">Browse equipment</button></div>
+   ${gear.length?`<div class="rules-list">${gear.map(n=>`<details class="rd"><summary>${esc(n)}</summary><p>${esc(EQD[n]||'')}</p></details>`).join('')}</div>`:''}
+  </div>`:`<p class="muted" style="font-size:.88rem">${esc(T.equip)}</p>`}
+  ${f.type==='ogryn'?`<div class="sub"><span class="label">Ogryn options</span><div class="row">${[0,1].map(h=>`<select data-hand="${k}" data-h="${h}" id="h${h}-${k}" aria-label="Hand ${h+1}">${['Open Fist','Power Maul','Horrific Appendages'].map(o=>`<option ${(f.hands||['Open Fist','Open Fist'])[h]===o?'selected':''}>${o}</option>`).join('')}</select>`).join('')}<label class="check"><input type="checkbox" data-plate="${k}" id="pl-${k}" ${f.plate?'checked':''}> Plate Mail (+15)</label></div><p class="muted" style="font-size:.82rem">Power Maul +30, Horrific Appendages +20, each replacing one Open Fist.</p></div>`:''}
+  ${canMut?`<div class="sub"><span class="label">Mutations ${muts.length}/${st.T} Toughness${G.founding&&T.mut[1]?` · recruit ${T.mut[0]}–${T.mut[1]}`:''}</span>
+   <div class="chips">${muts.map((n,i)=>`<span class="chip" title="${esc(MUTS[n]?.t)}">${esc(n)} <b>${MUTS[n]?.c}</b><button aria-label="Remove ${esc(n)}" data-rmmut="${k}" data-i="${i}">×</button></span>`).join('')||'<span class="muted">None.</span>'}</div>
+   <div class="row"><button class="btn small primary" data-pick="${k}" data-kind="mut">Browse mutations</button></div>
+   ${muts.length?`<div class="rules-list">${muts.map(n=>`<details class="rd"><summary>${esc(n)}</summary><p>${esc(MUTS[n]?.t)}</p></details>`).join('')}</div>`:''}
+  </div>`:''}
+  ${T.wyrd?`<div class="sub"><span class="label">Wyrd Powers – first free, +30 each extra (recruitment only)</span><div class="grid2">${WYRD.map(w=>`<label class="check"><input type="checkbox" data-wyrd="${k}" value="${esc(w[0])}" ${(f.wyrd||[]).includes(w[0])?'checked':''}> ${esc(w[0])}</label>`).join('')}</div></div>`:''}
+  <div class="sub"><span class="label">Skills${T.free?' – one free Primary at recruitment':''}</span>
+   <div class="chips">${skillsOf(f).map((n,i)=>`<span class="chip" title="${esc(skillText(n))}">${esc(n)}${skillSetName(n)?` <b>${esc(skillSetName(n))}</b>`:''}<button aria-label="Remove ${esc(n)}" data-rmsk="${k}" data-i="${i}">×</button></span>`).join('')||'<span class="muted">None.</span>'}</div>
+   ${f.type!=='scrunt'?`<div class="row"><button class="btn small primary" data-pick="${k}" data-kind="skill">Browse skills</button></div>`:''}
+   <p class="muted" style="font-size:.82rem">Primary: ${AC.P.join(', ')||'–'}. Secondary: ${AC.S.join(', ')||'–'}.</p>
+   <details class="rd"><summary>Type skills by hand</summary><input type="text" id="sk-${k}" data-skills="${k}" list="skilllist" value="${esc(f.skills)}" placeholder="e.g. Frenzy, Aura of Despair" style="margin-top:6px"></details></div>
+  <div class="row">
+   ${T.spec?`<label class="check"><input type="checkbox" data-spec="${k}" id="sp-${k}" ${f.spec?'checked':''}> Specialist</label>`:''}
+   ${f.type==='apostle'?`<label class="check"><input type="checkbox" data-psy="${k}" id="ps-${k}" ${f.psyker?'checked':''} ${G.rep<10&&!f.psyker?'disabled':''}> Psyker upgrade (+30, Rep 10, random Wyrd Power)</label>`:''}
+   ${f.type==='daemon'?`<label class="check"><input type="checkbox" data-psy="${k}" id="ps-${k}" ${f.psyker?'checked':''}> Psyker upgrade (+30, random Wyrd Power)</label>`:''}
+  </div>
+  <div class="sub"><span class="label">Campaign</span>
+   <div class="row"><label class="field"><span class="label">Status</span><select data-cstat="${k}" id="cs-${k}">${CSTAT.map(([v,l])=>`<option value="${v}" ${CS===v?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label class="field" style="width:90px"><span class="label">XP</span><input type="number" min="0" id="xp-${k}" data-xp="${k}" value="${+f.xp||0}"></label>
+   <button class="btn small" data-rollli="${k}" ${CS==='dead'?'disabled':''}>Roll Lasting Injury</button></div>
+   ${liResult(lastLI[k])}
+   <div class="chips">${(f.injuries||[]).map((n,i)=>`<span class="chip" title="${esc(LIP[n]?.t)}">${esc(n)}<button aria-label="Remove ${esc(n)}" data-rminj="${k}" data-i="${i}">×</button></span>`).join('')||'<span class="muted">No lasting injuries.</span>'}</div>
+   <select data-addinj="${k}" id="ai2-${k}" aria-label="Add a lasting injury"><option value="">+ Add lasting injury…</option>${LI.filter(x=>x.perm).map(x=>`<option value="${x.n}">${x.r} ${x.n} – ${x.t.replace('Goes into Recovery. ','')}</option>`).join('')}</select>
+  </div>
+  <div class="sub"><span class="label">Special rules</span>${ruleDetails(rules)}</div>
+  <div class="row">${confirmKey===k?`<span class="confirm">Remove ${esc(f.name||T.n)}? <button class="btn small danger" data-rmf-yes="${k}">Remove</button><button class="btn small" data-act="cancel">Keep</button></span>`:`<button class="btn small" data-dup="${k}">Duplicate</button><button class="btn small danger" data-rmf="${k}">Remove</button>`}</div>
+ </div>`:''}
+ </article>`}
+
+const byUid=k=>G.fighters.find(f=>f.uid===k);
+function commit(){G.example=false;save();renderBuild()}
+app.addEventListener('click',e=>{const el=e.target.closest('button,[data-toggle]');if(!el||!document.querySelector('.builder'))return;const d=el.dataset;
+ if(d.pick){UI.pick={uid:d.pick,kind:d.kind};UI.pickCat=d.kind==='skill'?'mine':'all';UI.pickQ='';saveUI();location.hash='#pick';return}
+ if(d.toggle){const f=byUid(d.toggle);f.open=!f.open;save();renderBuild();return}
+ if(d.act==='addsel'){const v=document.getElementById('add-sel').value;if(v){UI.addSel=v;saveUI();d.add=v}}
+ if(d.add){const t=d.add;const f=F(t,'',[],[],{open:true});if(t==='ogryn')f.hands=['Open Fist','Open Fist'];G.fighters.forEach(x=>x.open=false);G.fighters.push(f);commit();
+   requestAnimationFrame(()=>document.querySelector(`[data-uid="${f.uid}"]`)?.scrollIntoView({block:'start',behavior:'smooth'}));toast(`${FT[t].n} recruited`);return}
+ if(d.rmitem){const f=byUid(d.rmitem);f.items.splice(+d.i,1);commit();return}
+ if(d.rmmut){const f=byUid(d.rmmut);f.muts.splice(+d.i,1);commit();return}
+ if(d.rmsk){const f=byUid(d.rmsk);const a=skillsOf(f);a.splice(+d.i,1);setSkills(f,a);commit();return}
+ if(d.rminj){const f=byUid(d.rminj);f.injuries.splice(+d.i,1);commit();return}
+ if(d.rollli){const f=byUid(d.rollli);lastLI[f.uid]=rollLI(f);commit();toast(`${lastLI[f.uid].v}: ${lastLI[f.uid].r.n}`);return}
+ if(d.dup){const f=byUid(d.dup);const c=JSON.parse(JSON.stringify(f));c.uid=uid();c.name=(f.name||FT[f.type].n)+' II';G.fighters.splice(G.fighters.indexOf(f)+1,0,c);commit();return}
+ if(d.rmf){confirmKey=d.rmf;renderBuild();return}
+ if(d.rmfYes){G.fighters=G.fighters.filter(f=>f.uid!==d.rmfYes);confirmKey=null;commit();return}
+ const a=d.act;if(!a)return;
+ if(a==='cog'){UI.cog=!UI.cog;saveUI();renderBuild();if(UI.cog)requestAnimationFrame(()=>document.querySelector('[aria-label="Roster tools"]')?.scrollIntoView({block:'nearest',behavior:'smooth'}));return}
+ if(a==='cancel'){confirmKey=null;renderBuild()}
+ if(a==='new'){confirmKey='new';renderBuild()}
+ if(a==='new-yes'){G={name:'Unnamed Cult',ded:D().key,path:'destruction',budget:1000,rep:0,founding:true,fighters:[]};confirmKey=null;save();renderBuild()}
+ if(a==='example'){G=exampleGang();save();renderBuild()}
+ if(a==='expand'||a==='collapse'){G.fighters.forEach(f=>f.open=a==='expand');save();renderBuild()}
+ if(a==='copytext')copy(rosterText(),'Roster copied');
+ if(a==='copyjson')copy(JSON.stringify(G),'Code copied',document.getElementById('io'));
+ if(a==='import'){try{const v=JSON.parse(document.getElementById('io').value);if(!v||!Array.isArray(v.fighters))throw 0;G=v;save();renderBuild();toast('Gang loaded')}catch(err){toast('That code isn’t a gang roster')}}
+});
+app.addEventListener('keydown',e=>{const t=e.target.closest('[data-toggle]');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();t.click()}});
+app.addEventListener('input',e=>{const t=e.target;if(!document.querySelector('.builder'))return;
+ if(t.dataset.name){byUid(t.dataset.name).name=t.value;G.example=false;save();const nm=t.closest('.fc').querySelector('.nm');nm.textContent=t.value||FT[byUid(t.dataset.name).type].n}
+ if(t.id==='g-name'){G.name=t.value;G.example=false;save()}
+ if(t.dataset.skills){byUid(t.dataset.skills).skills=t.value;save()}
+});
+app.addEventListener('change',e=>{const t=e.target;if(!document.querySelector('.builder'))return;const d=t.dataset;
+ if(t.id==='g-path'){G.path=t.value;commit()}
+ if(t.id==='g-budget'){G.budget=Math.max(0,+t.value||0);commit()}
+ if(t.id==='g-rep'){G.rep=Math.max(0,+t.value||0);commit()}
+ if(t.id==='g-found'){G.founding=t.checked;commit()}
+ if(d.additem&&t.value){byUid(d.additem).items.push(t.value);commit()}
+ if(d.addmut&&t.value){byUid(d.addmut).muts.push(t.value);commit()}
+ if(d.wyrd){const f=byUid(d.wyrd);f.wyrd=f.wyrd||[];if(t.checked)f.wyrd.push(t.value);else f.wyrd=f.wyrd.filter(x=>x!==t.value);commit()}
+ if(d.spec){byUid(d.spec).spec=t.checked;commit()}
+ if(d.psy){byUid(d.psy).psyker=t.checked;commit()}
+ if(d.hand){const f=byUid(d.hand);f.hands=f.hands||['Open Fist','Open Fist'];f.hands[+d.h]=t.value;commit()}
+ if(d.plate){byUid(d.plate).plate=t.checked;commit()}
+ if(d.undiv){byUid(d.undiv).undiv=t.value;commit()}
+ if(d.cstat){byUid(d.cstat).status=t.value;commit()}
+ if(d.xp){byUid(d.xp).xp=Math.max(0,+t.value||0);commit()}
+ if(d.addinj&&t.value){const f=byUid(d.addinj);f.injuries=(f.injuries||[]).concat(t.value);commit()}
+ if(t.id==='g-ded'){G.ded=t.value;applyDed();commit()}
+});
+function copy(txt,msg,fallbackEl){try{navigator.clipboard.writeText(txt).then(()=>toast(msg),()=>sel(fallbackEl))}catch(e){sel(fallbackEl)}
+ function sel(el){if(el){el.focus();el.select();toast('Press Ctrl/Cmd+C to copy')}else{const ta=document.getElementById('io');if(ta){ta.value=txt;ta.closest('details').open=true;ta.focus();ta.select();toast('Selected – press Ctrl/Cmd+C')}}}}
+function rosterText(){const L=[`${G.name} – Chaos Cult (${D().n}), ${PATHS[G.path].n}`,`${gangCost()} / ${G.budget} credits · Rep ${G.rep}`,''];
+ G.fighters.forEach(f=>{const T=FT[f.type],s=stats(f);L.push(`${f.name||T.n} – ${T.n}${f.spec?' (Specialist)':''} – ${cost(f)} cr`);
+  L.push('  '+STATK.map(k=>k+' '+fmt(k,s[k])).join(' | '));
+  const w=weaponsOf(f).map(x=>x[0]);if(w.length)L.push('  Weapons: '+w.join(', '));const g=gearOf(f);if(g.length)L.push('  Wargear: '+g.join(', '));
+  if(cstat(f)!=='active')L.push('  Status: '+CSTAT.find(x=>x[0]===cstat(f))[1]);if((f.injuries||[]).length)L.push('  Lasting Injuries: '+f.injuries.join(', '));if(+f.xp)L.push('  XP: '+f.xp);if(T.mark)L.push('  '+markName()+': '+markSummary(f));if((f.muts||[]).length)L.push('  Mutations: '+f.muts.join(', '));if(f.wyrd&&f.wyrd.length)L.push('  Wyrd Powers: '+f.wyrd.join(', '));if(f.skills)L.push('  Skills: '+f.skills);L.push('')});
+ return L.join('\n')}
+
+/* ============================== PLAY ============================== */
+const STATUS=[['standing','Standing'],['pinned','Pinned'],['si','Seriously Injured'],['broken','Broken'],['ooa','Out of Action'],['out','Not in crew']];
+const fsOf=f=>B.fs[f.uid]||(B.fs[f.uid]={st:cstat(f)==='active'?'standing':'out',fw:0,imp:false,eng:false});
+function diceFor(f){const s=fsOf(f);if(f.type==='scrunt'||cstat(f)!=='active')return 0;if(['si','broken','ooa','out'].includes(s.st))return 0;let n=1;
+ if(f.type==='chosen')n=2;if((f.items||[]).includes('Cult Icon'))n=Math.max(n,3);if(/hagiocracy/i.test(f.skills||''))n=Math.max(n,3);if(s.imp)n=Math.max(n,3);
+ if(G.path==='vacillation'&&(FT[f.type].hier))n++;if(G.path==='destruction'&&s.eng)n++;return n}
+function endPhaseInfo(){let n=0;const parts=[];G.fighters.forEach(f=>{const k=diceFor(f);if(k){n+=k}});parts.push(`${n} from fighters`);
+ if(G.path==='destruction'&&B.enemyOOA){n+=B.enemyOOA;parts.push(`${B.enemyOOA} for enemies Out of Action`)}
+ if(G.path==='perversion'&&B.enemyFW){n+=B.enemyFW;parts.push(`${B.enemyFW} for wounded enemies`)}
+ if(G.path==='degeneration'){const k=G.fighters.filter(f=>['si','ooa'].includes(fsOf(f).st)).length;if(k){n+=k;parts.push(`${k} for your fallen`)}}
+ let thr=5;if(G.path==='affliction'){const ld=G.fighters.find(f=>f.type==='apostle');if(B.bottled||(ld&&fsOf(ld).st==='ooa'))thr=4}
+ return{n,thr,parts}}
+let playConfirm=false;
+function renderPlay(){const tab=UI.play||'battle';
+ app.innerHTML=`<div class="stack" style="gap:18px">
+  <div class="row" style="justify-content:space-between"><div><h2>${esc(G.name)}</h2><p class="muted">${PATHS[G.path].n} · ${G.fighters.length} fighters · ${gangCost()} credits</p></div>
+  <div class="seg" role="group" aria-label="Play view">${[['battle','Battle'],['pre','Pre-battle'],['sheet','Cheat sheet']].map(([k,l])=>`<button data-ptab="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div></div>
+  ${tab==='battle'?playBattle():tab==='pre'?playPre():playSheet()}
+ </div>`}
+
+function playBattle(){const ep=endPhaseInfo();const arts=pathArts(G.path);
+ return `<section class="hud">
+   <div class="panel stack"><span class="label">Round</span><div class="counter"><button class="step" data-b="round-" aria-label="Previous round">−</button><span class="big">${B.round}</span><button class="step" data-b="round+" aria-label="Next round">+</button></div></div>
+   <div class="panel stack"><span class="label">Delusion Dice pool</span><div class="counter"><button class="step" data-b="pool-" aria-label="Remove a die">−</button><span class="pool num">${B.pool}</span><button class="step" data-b="pool+" aria-label="Add a die">+</button></div></div>
+   <div class="panel stack" style="grid-column:span 2;min-width:0"><span class="label">End Phase</span>
+     <p style="font-size:.9rem">Roll <strong class="num">${ep.n}</strong> dice, each ${ep.thr}+ adds a Delusion Die <span class="muted">(${ep.parts.join(', ')})</span>.</p>
+     <div class="row">${G.path==='destruction'?`<label class="check">Enemies OOA <input type="number" min="0" id="b-eooa" value="${B.enemyOOA}" style="width:64px"></label>`:''}${G.path==='perversion'?`<label class="check">Enemies with a Flesh Wound <input type="number" min="0" id="b-efw" value="${B.enemyFW}" style="width:64px"></label>`:''}${G.path==='affliction'?`<label class="check"><input type="checkbox" id="b-bot" ${B.bottled?'checked':''}> Gang has failed a Bottle test</label>`:''}</div>
+     <div class="row"><button class="btn primary" data-b="endphase">Roll End Phase</button><button class="btn" data-b="nextround">Next round</button>${playConfirm?`<span class="confirm">Reset the whole battle? <button class="btn small danger" data-b="reset-yes">Reset</button><button class="btn small" data-b="reset-no">Keep</button></span>`:`<button class="btn ghost" data-b="reset">Reset battle</button>`}</div>
+     ${B.last&&B.last.kind==='end'?`<div class="result"><div class="dice">${B.last.dice.map(v=>`<span class="die ${v>=B.last.thr?'hit':''}">${v}</span>`).join('')}</div><p><strong>+${B.last.gain}</strong> Delusion Dice. Impassioned cleared.</p></div>`:''}
+   </div>
+ </section>
+ <section class="panel stack" aria-label="Articles of Damnation">
+  <div class="row" style="justify-content:space-between"><h3>Articles of Damnation</h3><span class="pill blood">${esc(xpShort())}</span></div>
+  <p class="muted" style="font-size:.88rem">Declare at the start of an activation, commit dice, roll the Threshold or more to pass.</p>
+  <div class="pgrid">${arts.map(a=>`<article class="pc"><div class="pch"><h3>${esc(a.n)}</h3><span class="big" style="font-size:1.1rem;color:var(--blood);white-space:nowrap">${a.t}+</span></div>
+   <div class="row"><span class="pill">Article ${a.num}</span>${a.id[0]==='c'?'<span class="pill brass">Any Path</span>':''}</div>
+   <p style="font-size:.92rem"><strong>Pass:</strong> ${esc(a.pass)}</p>
+   <p class="muted" style="font-size:.88rem;margin-top:auto"><strong>Fail:</strong> ${esc(a.fail)}</p></article>`).join('')}</div>
+ </section>
+ <section class="stack" aria-label="Fighters"><div class="row" style="justify-content:space-between"><h3>Fighters</h3><span class="muted" style="font-size:.88rem">Toughness drops by 1 per Flesh Wound; at Flesh Wounds equal to Toughness the fighter goes Out of Action.</span></div>
+ <div class="tk">${alive().map(trackCard).join('')||'<p class="muted">Build a gang first.</p>'}</div></section>`}
+
+function trackCard(f){const T=FT[f.type],s=fsOf(f),st=stats(f);const hurt={};if(s.fw)hurt.T=Math.max(0,st.T-s.fw);
+ const rules=T.rules.slice();if(T.mark)rules.push(markName());const g=gearOf(f);
+ return `<article class="tc st-${s.st}">
+  <div class="hd"><strong>${esc(f.name||T.n)}</strong><span class="muted" style="font-size:.82rem">${T.n}${f.spec?' · Specialist':''}</span>${cstat(f)!=='active'?`<span class="pill brass">${esc(CSTAT.find(x=>x[0]===cstat(f))[1])}</span>`:''}<span class="pill" style="margin-left:auto" title="Delusion Dice this End Phase">${diceFor(f)} DD</span></div>
+  ${s.st==='ooa'?`<div class="row"><button class="btn small primary" data-pli="${f.uid}">Roll Lasting Injury</button><span class="muted" style="font-size:.82rem">Out of Action – roll after the battle.</span></div>${liResult(lastLI[f.uid])}`:''}
+  ${statTable(st,null,hurt)}
+  ${wtable(weaponsOf(f))}
+  ${g.length||(f.muts||[]).length||f.skills||(f.wyrd||[]).length?`<p style="font-size:.85rem">${[g.join(', '),(f.muts||[]).join(', '),f.skills,(f.wyrd||[]).join(', ')].filter(Boolean).map(esc).join(' · ')}</p>`:''}
+  <div class="row"><select data-st="${f.uid}" aria-label="Status of ${esc(f.name||T.n)}">${STATUS.map(([k,l])=>`<option value="${k}" ${s.st===k?'selected':''}>${l}</option>`).join('')}</select>
+   <span class="fw">FW <button class="step" data-fw="${f.uid}" data-d="-1" aria-label="Remove flesh wound">−</button><span class="num" style="font-weight:600">${s.fw}</span><button class="step" data-fw="${f.uid}" data-d="1" aria-label="Add flesh wound">+</button></span></div>
+  <div class="row"><label class="check"><input type="checkbox" data-imp="${f.uid}" ${s.imp?'checked':''}> Impassioned</label>${G.path==='destruction'?`<label class="check"><input type="checkbox" data-eng="${f.uid}" ${s.eng?'checked':''}> Engaged</label>`:''}</div>
+  <details class="rd"><summary>Rules & wargear</summary><div class="t stack">${ruleDetails(rules)}${g.map(n=>`<p style="font-size:.85rem"><strong>${esc(n)}:</strong> ${esc(EQD[n]||'')}</p>`).join('')}${(f.muts||[]).map(n=>`<p style="font-size:.85rem"><strong>${esc(n)}:</strong> ${esc(MUTS[n]?.t)}</p>`).join('')}${(f.skills||'').split(',').map(x=>x.trim()).filter(Boolean).map(n=>{const s=ALLSKILLS.find(z=>z[0].toLowerCase()===n.toLowerCase());return s?`<p style="font-size:.85rem"><strong>${esc(s[0])}:</strong> ${esc(s[1])}</p>`:''}).join('')}${(f.wyrd||[]).map(n=>{const w=WYRD.find(z=>z[0]===n);return w?`<p style="font-size:.85rem"><strong>${esc(w[0])} (${w[1]}):</strong> ${esc(w[2])}</p>`:''}).join('')}</div></details>
+ </article>`}
+
+function ritFav(){const R=B.rit||{};return D().key==='undivided'?(FAV[R.fav]?R.fav:'hierarch'):D().fav}
+function ritMatch(){const R=B.rit||{};return D().key==='undivided'?!!R.match:true}
+function playPre(){const R=B.rit||{won:false,gain:false,bleed:false,lost:false,rec:false,defile:''};const nonLeaders=G.fighters.filter(f=>f.type!=='apostle');const FV=FAV[ritFav()];const und=D().key==='undivided';
+ const mod=(R.won?1:0)+(R.gain?1:0)+(R.bleed?1:0)+(ritMatch()?1:0)-(R.lost?1:0)-(R.rec?1:0);
+ return `<section class="panel stack" aria-label="Dark Ritual">
+  <div class="row" style="justify-content:space-between"><h3>${FV.r}</h3><span class="pill brass">Dark Ritual pre-battle action</span></div>
+  <p class="muted" style="font-size:.9rem">Before crews are chosen. Roll 2D6 plus modifiers: 9+ wins the favour of ${esc(FV.god)} for one battle; 4 or less turns the ritual's focus into a Chaos Spawn.</p>
+  ${und?`<div class="field"><label class="label" for="rit-fav">Chaos Undivided may petition any power</label><select id="rit-fav">${Object.entries(FAV).map(([k2,F2])=>`<option value="${k2}" ${ritFav()===k2?'selected':''}>${F2.god} – ${F2.r}</option>`).join('')}</select></div>`:''}
+  <div class="grid2">
+   <label class="check"><input type="checkbox" data-rit="won" ${R.won?'checked':''}> Won last battle (+1)</label>
+   <label class="check"><input type="checkbox" data-rit="gain" ${R.gain?'checked':''}> Gained Rep last battle (+1)</label>
+   <label class="check"><input type="checkbox" data-rit="bleed" ${R.bleed?'checked':''}> Bleed a Captive (+1)</label>
+   ${und?`<label class="check"><input type="checkbox" data-rit="match" ${R.match?'checked':''}> Ritual matches dedication (+1) – agree with your Arbitrator</label>`:`<label class="check"><input type="checkbox" checked disabled> Ritual matches dedication (+1)</label>`}
+   <label class="check"><input type="checkbox" data-rit="lost" ${R.lost?'checked':''}> Lost Rep last battle (−1)</label>
+   <label class="check"><input type="checkbox" data-rit="rec" ${R.rec?'checked':''}> Leader in Recovery (−1)</label>
+  </div>
+  <div class="field"><label class="label" for="rit-def">Defilement (optional): fighter starts with D3 Flesh Wounds, +1 per wound</label><select id="rit-def"><option value="">No Defilement</option>${G.fighters.map(f=>`<option value="${f.uid}" ${R.defile===f.uid?'selected':''}>${esc(f.name||FT[f.type].n)}</option>`).join('')}</select></div>
+  <div class="row"><button class="btn primary" data-b="ritual" ${nonLeaders.length?'':'disabled'}>Enact the ritual</button><span class="muted">Fixed modifier ${mod>=0?'+':''}${mod}</span></div>
+  ${B.ritRes?ritResult(B.ritRes):''}
+  ${R.bleed?`<p class="muted" style="font-size:.85rem">Bleed the Captive: the captive rolls a Lasting Injury of 50+D6 and is deployed within 12" of the table centre. An enemy within 1" can Free Captive (Simple); pass Intelligence to capture them, fail and they return with Humiliated.</p>`:''}
+ </section>
+ <section class="panel stack" aria-label="Sub-plots">
+  <div class="row" style="justify-content:space-between"><h3>Sub-plot deck</h3><span class="muted num" style="font-size:.88rem">${54-DK.removed.length-DK.hand.length} cards left · ${DK.removed.length} completed</span></div>
+  <p class="muted" style="font-size:.9rem">Draw in secret. Tap a card to reveal its text. Completed cards leave the deck for the rest of the campaign.</p>
+  <div class="row"><button class="btn primary" data-b="draw">Draw a sub-plot</button><button class="btn" data-b="returnall" ${DK.hand.length?'':'disabled'}>Return hand to deck</button>${DK.confirm?`<span class="confirm">Restore every completed card? <button class="btn small danger" data-b="reshuffle-yes">Restore</button><button class="btn small" data-b="reshuffle-no">Keep</button></span>`:`<button class="btn ghost" data-b="reshuffle">Rebuild full deck</button>`}</div>
+  ${DK.note?`<p class="pill blood">${esc(DK.note)}</p>`:''}
+  <div class="grid2">${DK.hand.map(id=>{const [s,r]=id.split('-');const S=SP[s],c=S.c[RANKS.indexOf(r)];const shown=(DK.shown||[]).includes(id);
+   return `<div class="card-back"><div class="row" style="justify-content:space-between"><span class="suit">${r}${S.sym}</span><span class="pill">${S.theme} · ${S.reward}</span></div>
+   ${shown?`<strong>${esc(c[0])}</strong><p style="font-size:.88rem">${esc(c[1])}</p>`:`<button class="btn small" data-reveal="${id}">Reveal</button>`}
+   <div class="row"><button class="btn small" data-done="${id}">Completed</button><button class="btn small ghost" data-back="${id}">Return to deck</button></div></div>`}).join('')}</div>
+ </section>`}
+function ritResult(r){return `<div class="result ${r.total>=9?'pass':r.total<=4?'fail':''}"><div class="dice">${r.dice.map(v=>`<span class="die hit">${v}</span>`).join('')}${r.def?`<span class="pill">Defilement +${r.def}</span>`:''}</div>
+ <p><strong>${r.total}</strong> – focus: <strong>${esc(r.focus)}</strong>${r.defName?` · ${esc(r.defName)} starts with ${r.def} Flesh Wound${r.def>1?'s':''}`:''}</p>
+ ${r.total>=9?(()=>{const FV=FAV[r.fav]||FAV.khorne;return `<p><strong>The favour of ${esc(FV.god)}</strong> for this battle (mark it on the roster). ${esc(r.focus)} gains ${r.xp} XP.</p><ul style="margin:0;padding-left:1.2em"><li><strong>Blessing:</strong> ${esc(FV.b[0])}</li><li><strong>Boon:</strong> ${esc(FV.b[1])}</li><li><strong>Warped:</strong> ${esc(FV.b[2])}</li></ul>`})():r.total<=4?`<p><strong>Unworthy.</strong> ${esc(r.focus)} is transformed into a Chaos Spawn.</p>`:`<p>No favour this time; nothing else happens.</p>`}</div>`}
+
+function playSheet(){const sec=(t,b,open)=>`<details class="rd" ${open?'open':''}><summary style="font-size:1rem">${t}</summary><div class="t stack">${b}</div></details>`;
+ const list=a=>`<ul style="margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px">${a.map(x=>`<li><strong>${esc(x[0])}${x[1]&&x.length>2?' ('+esc(x[1])+')':''}:</strong> ${esc(x[x.length-1])}</li>`).join('')}</ul>`;
+ return `<div class="stack">
+ ${sec('Gang rules in play',list([['Limited Supply','Every ranged weapon a Chaos Cult fighter uses has the Scarce trait.'],['Infernal Pacts','On activation, a fighter with Blaze and/or Insane may remove them, then suffers D2 Flesh Wounds at the end of the activation.'],[markName(),'Leader, Champions and the Daemon. '+markText()],['Devotion','Friendly fighters within 6" and line of sight of the Apostle may use their Cool and Willpower.'],['Group Activation','Apostle (2), Disciple (1), Cult Icon +1. One Group Activation per gang per turn. The Ogryn is Slow-Witted.'],['Bottle tests','Apostle passing Cool: all friends within 12" pass. Champions: 6". Mutant Lord: only Mutants within 6".']]),true)}
+ ${sec('Delusion Dice and Articles',list([['Generate','End Phase: D6 per fighter not Seriously Injured or Broken; 5+ adds a die. Chosen roll 2, Cult Icon/Hagiocracy/Impassioned roll 3.'],['Beseech the Gods (Double)','The fighter becomes Impassioned and rolls three D6 in the End Phase.'],['Invoke','Declare at the start of an activation, commit dice, total ≥ Threshold to pass. Dice are discarded either way.'],[D().n,xpRule()],['Limit','A passed Article can’t be invoked again this round.'],['Path benefit',PATHS[G.path].benefit]]),true)}
+ ${sec('Lasting Injuries (D66)',`<div class="scroll"><table class="dt"><tbody>${LI.map(x=>`<tr><td class="c">${x.r}</td><td><strong>${x.n}</strong></td><td>${esc(x.t)}</td></tr>`).join('')}</tbody></table></div><p class="muted" style="font-size:.85rem">Amaranthine: if the Apostle suffers a Memorable Death, a random fighter dies instead and the Apostle takes Enfeebled and Crooked Body. The Daemon ignores everything except Memorable Death.</p>`)}
+ ${sec('Heresy skills',list(HERESY))}
+ ${sec(`${D().god} skills (${D().n})`,list(GODSKILL[D().god]))}
+ ${sec('Wyrd Powers (Aetheric)',list(WYRD))}
+ ${sec('Mutations',list(MUTL.map(m=>[m[1],m[3]])))}
+ ${sec('Chaos Spawn',`<p>M D3+3". Roll a D6 per X on creation: 1 – WS4+ S3 T4 W1 I5+ A1 (32mm); 2–5 – WS4+ S4 T5 W2 I4+ A2 (40/50mm); 6 – WS3+ S5 T6 W3 I3+ A3 (60mm).</p><p>Only Move, Charge, Fight and Coup de Grace. Never Pinned or Broken, immune to Insane, auto-passes Cool and Willpower. Flesh Wound counts as No Effect, Serious Injury as Flesh Wound. After battle, restrain with 0–3 Gangers/Juves: any 4+ succeeds; a 1 means that fighter takes a Lasting Injury.</p>`)}
+ ${sec('Familiar & Daemon',`<p><strong>Familiar:</strong> ${esc(EQD.Familiar)} ${esc(RULES['Omen of Fortune'])} ${esc(RULES['Precognition'])}</p><p><strong>Daemon:</strong> summoned only by “Call the Void” (12+). ${esc(RULES.Terrifying)} ${esc(RULES.Incorporeal)} ${esc(RULES.Instability)}</p>`)}
+ </div>`}
+
+app.addEventListener('click',e=>{if(!document.querySelector('[data-ptab]'))return;const el=e.target.closest('button');if(!el)return;const d=el.dataset;
+ if(d.ptab){UI.play=d.ptab;saveUI();renderPlay();return}
+ if(d.pli){const f=byUid(d.pli);lastLI[f.uid]=rollLI(f);save();renderPlay();toast(`${lastLI[f.uid].v}: ${lastLI[f.uid].r.n}`);return}
+ if(d.fw){const f=byUid(d.fw),s=fsOf(f);s.fw=Math.max(0,s.fw+(+d.d));if(s.fw>=stats(f).T&&s.st!=='ooa'){s.st='ooa';toast(`${f.name||FT[f.type].n} goes Out of Action`)}saveB();renderPlay();return}
+ if(d.reveal){DK.shown=DK.shown||[];DK.shown.push(d.reveal);saveD();renderPlay();return}
+ if(d.done){DK.hand=DK.hand.filter(x=>x!==d.done);DK.removed.push(d.done);DK.note='';saveD();renderPlay();return}
+ if(d.back){DK.hand=DK.hand.filter(x=>x!==d.back);saveD();renderPlay();return}
+ const b=d.b;if(!b)return;const arts=pathArts(G.path);
+ if(b==='round+'){B.round++}if(b==='round-'){B.round=Math.max(1,B.round-1)}
+ if(b==='pool+'){B.pool++}if(b==='pool-'){B.pool=Math.max(0,B.pool-1)}
+ if(b==='n+'){B.useN=Math.min(B.pool,(B.useN||2)+1)}if(b==='n-'){B.useN=Math.max(1,(Math.min(B.useN||2,B.pool))-1)}
+ if(b==='endphase'){const ep=endPhaseInfo();const dice=Array.from({length:ep.n},d6);const gain=dice.filter(v=>v>=ep.thr).length;B.pool+=gain;G.fighters.forEach(f=>fsOf(f).imp=false);B.last={kind:'end',dice,thr:ep.thr,gain}}
+ if(b==='nextround'){B.round++;B.used={};B.last=null;toast(`Round ${B.round}`)}
+ if(b==='reset'){playConfirm=true;renderPlay();return}
+ if(b==='reset-no'){playConfirm=false;renderPlay();return}
+ if(b==='reset-yes'){playConfirm=false;B={round:1,pool:0,used:{},fs:{},enemyOOA:0,enemyFW:0,bottled:false,last:null,art:B.art}}
+ if(b==='invoke'){const A=arts.find(a=>a.id===(B.art&&arts.find(x=>x.id===B.art)?B.art:arts[0].id));const n=Math.min(B.useN||2,B.pool);if(!A||!n)return;
+  const dice=Array.from({length:n},d6),total=dice.reduce((s,v)=>s+v,0),pass=total>=A.t;B.pool-=n;if(pass)B.used[A.id]=true;B.last={kind:'art',dice,total,t:A.t,pass,passT:A.pass,failT:A.fail}}
+ if(b==='ritual'){const R=B.rit||{};const pool=G.fighters.filter(f=>f.type!=='apostle');const focus=G.fighters.find(f=>f.type==='scrunt')||pool[Math.floor(Math.random()*pool.length)];
+  const dice=[d6(),d6()];let def=0,defName='';if(R.defile){const df=byUid(R.defile);if(df){def=1+Math.floor(Math.random()*3);defName=df.name||FT[df.type].n;const s=fsOf(df);s.fw=def;s.st='standing'}}
+  const total=dice[0]+dice[1]+(R.won?1:0)+(R.gain?1:0)+(R.bleed?1:0)+(ritMatch()?1:0)-(R.lost?1:0)-(R.rec?1:0)+def;
+  B.ritRes={fav:ritFav(),dice,def,defName,total,focus:focus?(focus.name||FT[focus.type].n):'–',xp:d6()}}
+ if(b==='draw'){DK.note='';draw(1)}
+ if(b==='returnall'){DK.hand=[];DK.note=''}
+ if(b==='reshuffle'){DK.confirm=true}if(b==='reshuffle-no'){DK.confirm=false}if(b==='reshuffle-yes'){DK={removed:[],hand:[],note:'',shown:[]}}
+ saveB();saveD();renderPlay()});
+function draw(n){const all=[];Object.keys(SP).forEach(s=>RANKS.forEach(r=>all.push(s+'-'+r)));all.push('JK-1','JK-2');
+ for(let i=0;i<n;i++){const avail=all.filter(c=>!DK.removed.includes(c)&&!DK.hand.includes(c)&&!(DK.jok||[]).includes(c));if(!avail.length){DK.note='The deck is empty.';return}
+  const c=avail[Math.floor(Math.random()*avail.length)];if(c.startsWith('JK')){DK.jok=(DK.jok||[]).concat(c);DK.note='Joker! Show it to your opponent and discard it. Drawing two more…';draw(2);DK.jok=[];continue}DK.hand.push(c)}}
+app.addEventListener('toggle',e=>{if(e.target.id==='arts-all'){UI.artsOpen=e.target.open;saveUI()}},true);
+app.addEventListener('change',e=>{if(!document.querySelector('[data-ptab]'))return;const t=e.target,d=t.dataset;
+ if(d.st){fsOf(byUid(d.st)).st=t.value}
+ if(d.imp){fsOf(byUid(d.imp)).imp=t.checked}
+ if(d.eng){fsOf(byUid(d.eng)).eng=t.checked}
+ if(t.id==='b-art'){B.art=t.value;B.last=B.last&&B.last.kind==='end'?B.last:null}
+ if(t.id==='b-eooa'){B.enemyOOA=Math.max(0,+t.value||0)}
+ if(t.id==='b-efw'){B.enemyFW=Math.max(0,+t.value||0)}
+ if(t.id==='b-bot'){B.bottled=t.checked}
+ if(d.rit){B.rit=B.rit||{};B.rit[d.rit]=t.checked}
+ if(t.id==='rit-def'){B.rit=B.rit||{};B.rit.defile=t.value}
+ if(t.id==='rit-fav'){B.rit=B.rit||{};B.rit.fav=t.value}
+ if(t.id==='rules-q')return;
+ saveB();if(document.querySelector('[data-ptab]'))renderPlay()});
+
+
+/* ============================== PICKER ============================== */
+function pickReason(f,E){const T=FT[f.type],k=itemCount(E.n);
+ if(E.lim&&k>=E.lim)return `Gang limit reached (${k}/${E.lim})`;
+ if(E.rep&&G.rep<E.rep)return `Needs Rep ${E.rep} (gang has ${G.rep})`;
+ if(E.n==='Familiar'&&(f.items||[]).includes('Familiar'))return 'One Familiar per fighter';
+ if(E.n==='Cult Icon'&&k>=1)return 'One Cult Icon per gang';
+ return ''}
+function pickWarn(f,E){if(f.type==='mutant'&&!f.spec&&E.cat==='special')return 'Only a Mutant Specialist can use this';
+ if(f.type==='cultist'&&!f.spec&&['special','heavy'].includes(E.cat))return 'Only a Cultist Specialist can use this';
+ if(E.cat==='armour'&&(f.muts||[]).includes('Crooked Body'))return 'Crooked Body: can’t wear armour';return ''}
+function renderPick(){const f=byUid(UI.pick.uid),T=FT[f.type],kind=UI.pick.kind,nm=f.name||T.n,q=(UI.pickQ||'').trim().toLowerCase();const st=stats(f);
+ const have=kind==='equip'?(f.items||[]):kind==='skill'?skillsOf(f):(f.muts||[]);
+ let body='';
+ if(kind==='equip'){const cats=CATS.filter(([c])=>EQL.some(e=>e[2]===c&&e[3].includes(T.code)));const cur=cats.some(c=>c[0]===UI.pickCat)?UI.pickCat:'all';
+  let list=EQL.filter(e=>e[3].includes(T.code)&&(cur==='all'||e[2]===cur)).map(e=>EQ[e[0]]).filter(E=>!q||(E.n+' '+(EQD[E.n]||'')+' '+E.p.map(n=>WP[n]?WP[n][8]:'').join(' ')).toLowerCase().includes(q));
+  const repHidden=UI.hideRep?list.filter(E=>E.rep&&G.rep<E.rep).length:0;if(UI.hideRep)list=list.filter(E=>!(E.rep&&G.rep<E.rep));
+  body=`<div class="seg" role="group" aria-label="Category"><button data-pcat="all" aria-pressed="${cur==='all'}">All</button>${cats.map(([c,l])=>`<button data-pcat="${c}" aria-pressed="${cur===c}">${l.replace(' weapons','').replace(' equipment','')}</button>`).join('')}</div>
+  <div class="row"><button class="btn small ${UI.hideRep?'primary':''}" data-hiderep aria-pressed="${!!UI.hideRep}">${UI.hideRep?'✓ ':''}Hide items above Rep ${G.rep}</button>${UI.hideRep&&repHidden?`<span class="muted" style="font-size:.85rem">${repHidden} hidden</span>`:''}</div>
+  <div class="pgrid">${list.map(E=>{const why=pickReason(f,E),warn=pickWarn(f,E),own=have.filter(x=>x===E.n).length,used=itemCount(E.n);
+   return `<article class="pc ${why?'off':''}"><div class="pch"><h3>${esc(E.n)}</h3><span class="big" style="font-size:1.1rem">${E.c}<small class="muted"> cr</small></span></div>
+   <div class="row">${E.lim?`<span class="pill">Gang 0-${E.lim} · ${used} taken</span>`:''}${E.rep?`<span class="pill ${G.rep<E.rep?'blood':''}">Rep ${E.rep}</span>`:''}${own?`<span class="pill brass">Carrying ${own}</span>`:''}${warn?`<span class="pill blood">${esc(warn)}</span>`:''}</div>
+   ${E.p.length?wtable(E.p.map(n=>[n,WP[n]])):''}${EQD[E.n]?`<p style="font-size:.9rem">${esc(EQD[E.n])}</p>`:''}
+   <div class="row" style="margin-top:auto"><button class="btn primary" data-padd="${esc(E.n)}" ${why?'disabled':''}>Add to ${esc(nm)}</button>${own?`<button class="btn" data-prm="${esc(E.n)}">Remove one</button>`:''}${why?`<span class="muted" style="font-size:.85rem">${esc(why)}</span>`:''}</div></article>`}).join('')||'<p class="muted">Nothing matches.</p>'}</div>`}
+ else if(kind==='skill'){const AC=access(f.type);const acc=n=>AC.P.includes(n)?'P':AC.S.includes(n)?'S':'';
+  const cur=UI.pickCat==='all'?'all':'mine';
+  const order=[...skillSets().filter(([n])=>acc(n)==='P'),...skillSets().filter(([n])=>acc(n)==='S'),...(cur==='all'?skillSets().filter(([n])=>!acc(n)):[])];
+  const groups=order.map(([set,L])=>[set,L.filter(h=>!q||(h[0]+' '+h[1]+' '+set).toLowerCase().includes(q))]).filter(([,L])=>L.length);
+  body=`<div class="seg" role="group" aria-label="Skill sets"><button data-pcat="mine" aria-pressed="${cur==='mine'}">This fighter’s sets</button><button data-pcat="all" aria-pressed="${cur==='all'}">All skill sets</button></div>
+  ${T.free?`<p class="muted" style="font-size:.88rem">Recruits with one free skill from a Primary set.</p>`:''}
+  ${groups.map(([set,L])=>{const a=acc(set);return `<section class="stack" aria-label="${esc(set)} skills" style="gap:8px"><div class="row"><h3 style="margin:0">${esc(set)}</h3>${a==='P'?'<span class="pill brass">Primary</span>':a==='S'?'<span class="pill">Secondary</span>':'<span class="pill blood">Not on this fighter’s list</span>'}</div>
+  <div class="pgrid">${L.map(h=>{const own=have.includes(h[0]);return `<article class="pc ${a?'':'off'}"><div class="pch"><h3>${esc(h[0])}</h3></div>
+   ${own?'<div class="row"><span class="pill brass">Has this</span></div>':''}
+   <p style="font-size:.92rem">${esc(h[1])}</p>
+   <div class="row" style="margin-top:auto">${own?`<button class="btn" data-prm="${esc(h[0])}">Remove</button>`:`<button class="btn primary" data-padd="${esc(h[0])}">Add to ${esc(nm)}</button>`}</div></article>`}).join('')}</div></section>`}).join('')||'<p class="muted">Nothing matches.</p>'}
+  <p class="muted" style="font-size:.82rem">Core skill text is a short summary – check the Necromunda rulebook for exact wording.</p>`}
+ else{const list=MUTL.filter(m=>!q||(m[1]+' '+m[3]).toLowerCase().includes(q));const n=have.length;
+  body=`<p class="muted">${n} Mutation${n===1?'':'s'} against Toughness ${st.T}. More Mutations than Toughness turns the fighter into a Chaos Spawn.${G.founding&&T.mut[1]?` At recruitment this fighter takes ${T.mut[0]}–${T.mut[1]}.`:''}</p>
+  <div class="pgrid">${list.map(m=>{const own=have.includes(m[1]);const danger=!own&&n+1>st.T;
+   return `<article class="pc"><div class="pch"><h3>${esc(m[1])}</h3><span class="big" style="font-size:1.1rem">${m[2]}<small class="muted"> cr</small></span></div>
+   <div class="row"><span class="pill">D66 ${m[0]}</span>${own?'<span class="pill brass">Has this</span>':''}${danger?'<span class="pill blood">Would turn them into a Spawn</span>':''}</div>
+   <p style="font-size:.92rem">${esc(m[3])}</p>
+   <div class="row" style="margin-top:auto">${own?`<button class="btn" data-prm="${esc(m[1])}">Remove</button>`:`<button class="btn primary" data-padd="${esc(m[1])}">Add to ${esc(nm)}</button>`}</div></article>`}).join('')||'<p class="muted">Nothing matches.</p>'}</div>`}
+ app.innerHTML=`<div class="picker stack" style="gap:16px">
+  <div class="pickbar panel"><div class="row" style="justify-content:space-between"><div><span class="label">${kind==='equip'?'Equipment':kind==='skill'?'Skills':'Mutations'} for</span><h2>${esc(nm)}</h2><p class="muted">${T.n} · <span class="num">${cost(f)}</span> credits · gang <span class="num">${gangCost()}</span>/${G.budget}</p></div><button class="btn primary" data-act="pickdone">Done</button></div>
+  <div class="chips">${have.map(n=>`<span class="chip">${esc(n)} <b>${kind==='equip'?(EQ[n]?.c??''):kind==='skill'?esc(skillSetName(n)):(MUTS[n]?.c??'')}</b><button aria-label="Remove ${esc(n)}" data-prm="${esc(n)}">×</button></span>`).join('')||`<span class="muted">${kind==='equip'?'Nothing equipped yet.':kind==='skill'?'No skills yet.':'No Mutations yet.'}</span>`}</div>
+  ${kind==='equip'?`<p class="muted" style="font-size:.85rem">${esc(T.equip)} All ranged weapons count as Scarce.</p>`:''}</div>
+  <input type="search" class="search" id="pick-q" placeholder="${kind==='equip'?'Search – e.g. chain, Blast, Rending':kind==='skill'?'Search – e.g. Pinned, charge, Cool':'Search – e.g. Wounds, armour'}" value="${esc(UI.pickQ||'')}" aria-label="Search">
+  ${body}</div>`}
+app.addEventListener('click',e=>{if(!document.querySelector('.picker'))return;const el=e.target.closest('button');if(!el)return;const d=el.dataset;const f=byUid(UI.pick.uid);const key=UI.pick.kind==='equip'?'items':'muts';
+ if(d.pcat){UI.pickCat=d.pcat;saveUI();renderPick();return}
+ if('hiderep' in d){UI.hideRep=!UI.hideRep;saveUI();renderPick();return}
+ if(UI.pick.kind==='skill'&&(d.padd||d.prm)){const a=skillsOf(f);if(d.padd&&!a.includes(d.padd))a.push(d.padd);if(d.prm){const i=a.indexOf(d.prm);if(i>-1)a.splice(i,1)}setSkills(f,a);G.example=false;save();renderPick();if(d.padd)toast(`${d.padd} added`);return}
+ if(d.padd){f[key]=(f[key]||[]).concat(d.padd);G.example=false;save();renderPick();toast(`${d.padd} added`);return}
+ if(d.prm){const i=(f[key]||[]).lastIndexOf(d.prm);if(i>-1)f[key].splice(i,1);save();renderPick();return}
+ if(d.act==='pickdone'){G.fighters.forEach(x=>x.open=x.uid===f.uid);save();UI.scrollTo=f.uid;saveUI();location.hash='#build'}});
+app.addEventListener('input',e=>{if(e.target.id!=='pick-q')return;UI.pickQ=e.target.value;saveUI();const pos=e.target.selectionStart;renderPick();const n=document.getElementById('pick-q');n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}});
+
+/* ============================== RULES ============================== */
+function rulesSections(){const tbl=(heads,rows,cls='')=>`<div class="scroll"><table class="dt ${cls}"><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+ const rb=(t,body,wide)=>`<div class="rb ${wide?'wide':''}">${t?`<h3>${t}</h3>`:''}${body}</div>`;
+ const ul=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+ const S=[];
+ S.push(['gang','Gang rules',[
+  rb('Founding the gang',ul(['Recruit only 2 Champions at the start. Leaders and Champions may never outnumber fighters with the Gang Fighter (X) rule (Gangers, Prospects, Juves).',`The gang is dedicated to ${D().title} and chooses a Path of Damnation. Change the dedication on the Gang page to see another god’s rules.`,'A fighter with more Mutations than their Toughness turns into a Chaos Spawn.','Some items are limited across the gang (0-X) or need Reputation (X) before they can be bought.'])),
+  rb('Chaos Cult rules',ul(['<strong>Limited Supply:</strong> every ranged weapon a Chaos Cult fighter uses counts as Scarce. Restricted items can’t be bought until their limits and Rep are met.','<strong>Outcast:</strong> Trading Post Rarity +2 on everything, plus a 25% handling charge on the total.','<strong>Ostracised:</strong> restricted Brutes and Hangers-On. Always Outlaw; can’t change Alignment.','<strong>Infernal Pacts:</strong> on activation, a fighter with Blaze and/or Insane may remove them, then suffers D2 Flesh Wounds at the end of the activation.','<strong>Vows of the Void:</strong> choose an Unholy Dedication and then a Path of Damnation at founding.'])),
+  rb('Brutes and Hangers-On',`<p>Total allowed by Reputation: 0–5 Rep: 1 · 5–9: 2 · 10–14: 3 · 15–19: 4 · 20–24: 5 · +1 per further 5 Rep.</p>`+ul(['<strong>Brutes:</strong> Corrupted Ogryn, Daemon, Iron Automata, Awakened Ogryn, Outlands Beastmaster, Sump Beast.','<strong>Hangers-On:</strong> Agitator, Cadaver Merchant, Chem Dealer, Heretek (no starting weapons or armour; Cultist Specialist equipment access), Propagandist, Rogue Doc, Scabber.','The book also says they “may never use Articles of Damnation” – most likely meaning hired Brutes and Hangers-On can’t invoke Articles.'])),
+ ]]);
+ S.push(['fighters','Fighters',ORDERF().map(t=>{const T=FT[t],b=baseStats(t),k=stats({type:t,muts:[]});const rules=T.rules.slice();if(T.mark)rules.push(markName());
+  return rb(`${T.n} <span class="pill">${T.role} · ${T.cost} cr${T.max<99?' · 0-'+T.max:''}</span>`,`${statTable(b)}${T.mark?`<p class="label">With ${esc(markName())}${D().key==='undivided'?' (Vicious shown)':''}</p>${statTable(k,b)}`:''}<p style="font-size:.9rem">${esc(T.equip)}</p><p style="font-size:.9rem"><strong>Primary:</strong> ${access(t).P.join(', ')||'–'} · <strong>Secondary:</strong> ${access(t).S.join(', ')||'–'}</p>${t==='daemon'?wtable([['Vorpal Claws',WP['Vorpal Claws']],['Warpfire Breath',WP['Warpfire Breath']]]):''}${t==='ogryn'?wtable(['Open Fist','Power Maul','Horrific Appendages'].map(n=>[n,WP[n]])):''}<div class="stack" style="gap:4px">${rules.map(n=>`<p style="font-size:.9rem"><strong>${esc(n)}:</strong> ${esc(RULES[n])}</p>`).join('')}</div>`)}).concat([
+  rb('Familiar <span class="pill">Exotic Beast · 65 cr on the lists · 0-3</span>',`<p style="font-size:.9rem">${esc(EQD.Familiar)} Max 1 per fighter. No equipment, unarmed attacks only.</p>${['Clamber','Omen of Fortune','Precognition'].map(n=>`<p style="font-size:.9rem"><strong>${n}:</strong> ${esc(RULES[n])}</p>`).join('')}`),
+  rb('Chaos Spawn <span class="pill">Unique</span>',`<p style="font-size:.9rem">Gained only when a fighter transforms. Free; adds 130 to Gang Rating. M D3+3". Roll a D6 per X: 1 – WS4+ S3 T4 W1 I5+ A1 (32mm); 2–5 – WS4+ S4 T5 W2 I4+ A2 (40/50mm); 6 – WS3+ S5 T6 W3 I3+ A3 (60mm).</p>`+ul(['<strong>Lost and Damned:</strong> the old fighter is removed; weapons go to the Stash, equipment is lost. The Spawn sits outside the gang structure.','<strong>Mindless Beast:</strong> only Move, Charge, Fight and Coup de Grace.','<strong>Warped Monstrosity:</strong> never Pinned or Broken, immune to Insane, auto-passes Cool and Willpower, auto-fails Leadership and Intelligence. Flesh Wound = No Effect, Serious Injury = Flesh Wound. Only Memorable Death as Lasting Injury.','<strong>Restraining the Spawn:</strong> after a battle, nominate 0–3 Gangers or Juves who weren’t OOA or SI; roll a D6 each. Any 4+ restrains it, otherwise it escapes. A 1 gives that fighter a Lasting Injury.'])),
+ ])]);
+ S.push(['equipment','Equipment lists',[rb('',`<p class="muted" style="font-size:.88rem">✓ = on that fighter's list. 0-X = gang limit. Rep = Reputation needed.</p>`+tbl(['Item','Cost','Limit','Rep',...WHO.map(w=>w[1])],CATS.flatMap(([cat,lab])=>[`<tr class="grp"><td colspan="${4+WHO.length}">${lab}</td></tr>`,...EQL.filter(e=>e[2]===cat).map(e=>{const E=EQ[e[0]];return `<tr><td>${esc(E.n)}</td><td class="c">${E.c}</td><td class="c">${E.lim?'0-'+E.lim:''}</td><td class="c">${E.rep||''}</td>${WHO.map(w=>`<td class="c">${E.who.includes(w[0])?'<span class="tick">✓</span>':''}</td>`).join('')}</tr>`})])),true)]]);
+ S.push(['armoury','Armoury',WPG.map(([lab,names])=>rb(lab,tbl(['Weapon','Rng S','Rng L','Acc S','Acc L','Str','AP','D','Am','Traits'],names.map(n=>`<tr><td><strong>${esc(n)}</strong></td>${WP[n].slice(0,8).map(v=>`<td class="c">${esc(v)}</td>`).join('')}<td>${esc(WP[n][8])}</td></tr>`)),true)).concat([
+  rb('Armour',ul(['Flak Armour','Gutterforged Cloak','Mesh Armour','Plate Mail','Scrap Shield','Boarding Shield','Mantle Malifica','Ablative Overlay','Refractor Field'].map(n=>`<strong>${n}:</strong> ${esc(EQD[n])}`).concat(['<strong>Light Carapace Armour:</strong> 4+ save.']))),
+  rb('Equipment',ul(['Cult Icon','Drop Rig','Filter Plugs','Photo-Goggles','Respirator','Skinblade','Strip Kit','Cred Sniffer','Armoured Undersuit','Exotic Furs','Opulent Jewellery','Uphive Raiments','Forged Guilder Seal','Hexagrammatic Fetish','Data Thief','Mono-Sight'].map(n=>`<strong>${n}:</strong> ${esc(EQD[n])}`).concat(['<strong>Book of Desecration:</strong> Words of Chaos (Basic) – until the next End Phase, friendly Chaos Cult fighters within 6" at the start of their activation may re-roll the D3 for a Charge, or one natural 1 to hit.']))),
+ ])]);
+ S.push(['mutations','Mutations',[rb('',`<p style="font-size:.9rem">Bought at recruitment where the profile allows, or gained through the Mutation skill set (with XP; one free when added to the roster).</p>`+tbl(['D66','Mutation','Effect','Cr'],MUTL.map(m=>`<tr><td class="c">${m[0]}</td><td><strong>${m[1]}</strong></td><td>${esc(m[3])}</td><td class="c">${m[2]}</td></tr>`)),true)]]);
+ S.push(['wyrd','Wyrd Powers',[rb('Aetheric Discipline',ul(['<strong>Sorcerer:</strong> access from recruitment; first power free, +30 each extra at recruitment.','<strong>Apostle:</strong> Psyker upgrade for 30 credits at 10 Rep – random power and Unsanctioned Psyker.','<strong>Daemon:</strong> Psyker upgrade for 30 credits at recruitment – random power and Unsanctioned Psyker.','Advancement: random power 9 XP, chosen power 12 XP. No limit.'])+tbl(['D6','Power','Type','Effect'],WYRD.map((w,i)=>`<tr><td class="c">${i+1}</td><td><strong>${w[0]}</strong></td><td>${w[1]}</td><td>${esc(w[2])}</td></tr>`)),true)]]);
+ S.push(['skills','Skills',[rb(`Skill access – ${D().title}`,tbl(['Fighter',...['Agi','Bra','Com','Cun','Fer','Lea','Sho','Sav',D().god.slice(0,3),'Her','Mut']],SKT[D().key].map(([n,r])=>`<tr><td><strong>${n}</strong></td>${r.map(v=>`<td class="c">${v==='P'?'<span class="tick">P</span>':v}</td>`).join('')}</tr>`))+`<p class="muted" style="font-size:.85rem">${skillCols().join(', ')}. P = Primary, S = Secondary.</p>`,true),
+  ...skillSets().map(([set,L])=>rb(set,`<ol>${L.map(h=>`<li><strong>${h[0]}:</strong> ${esc(h[1])}</li>`).join('')}</ol>${COREKEYS.includes(set)?'<p class="muted" style="font-size:.82rem">Short summary – check the Necromunda rulebook for exact wording.</p>':''}`))]]);
+ S.push(['dedication','Dedication & Mark',[rb(esc(D().title),`<p class="muted" style="font-size:.9rem">Also known as ${esc(D().aka)}.</p>`+ul([`The Gang Leader and Champions gain the ${esc(markName())} (so does the Daemon).`,D().key==='undivided'?'Rituals may seek the favour of any Chaos power, including the Hierarch of Anarchy and Terror.':`Rituals may seek the favour of ${esc(D().title)}.`,esc(xpRule()),`The Daemon becomes available once the gang reaches the dedication’s Rep: ${esc(daemonRepText())}.`,'The dedication can’t change without the Arbitrator’s permission.'].concat(D().key==='undivided'?['A Chaos Undivided gang may dedicate itself to one Chaos God as a Post-Battle Action.']:[]))),
+  rb(`The ${esc(markName())}`,D().key==='undivided'?ul(Object.values(UNDIV).map(u=>`<strong>${u.n}:</strong> ${u.t}.`).concat(['Each Leader and Champion picks one trait; the Daemon copies the Leader’s.'])):ul(D().traits.map(t=>`<strong>${t[0]}:</strong> ${esc(t[1])}.`).concat(['<strong>Hatred (X):</strong> must re-roll failed wound rolls in melee against fighters they hate.']))),
+  rb('Daemon Rep by dedication',ul(DEDKEYS.map(k=>`<strong>${DED[k].n}:</strong> ${DED[k].rep?DED[k].rep+' Rep':'3D3 +125 (as written)'}`)))]]);
+ S.push(['articles','Articles of Damnation',[rb('How they work',ul(['The Leader picks a Path at founding. It is permanent unless the Leader is replaced.','End Phase: D6 for every friendly fighter not Seriously Injured or Broken; each 5+ adds a Delusion Die. The pool carries over between rounds.','Beseech the Gods of Chaos (Double): the fighter becomes Impassioned and rolls three D6 in the End Phase.','Invoke at the start of an activation (no action, needs at least one die): commit dice, roll, total ≥ Threshold passes. Dice are discarded either way.','An Article affects only the invoking fighter until the start of their next activation, unless stated.','Any number of attempts, but a passed Article can’t be invoked again that round.'])),
+  ...PATHKEYS.map(k=>{const P=PATHS[k];return rb(P.n,`<p class="muted" style="font-size:.9rem">${esc(P.blurb)}</p><p style="font-size:.9rem"><strong>Gang benefit:</strong> ${esc(P.benefit)}</p><div class="arts">${pathArts(k).map(a=>`<div class="art"><h4>(${a.num}) “${esc(a.n)}” <span class="thr">${a.t}+</span></h4><p>${esc(a.pass)}</p><p class="f">Fail: ${esc(a.fail)}</p></div>`).join('')}</div>`,true)})]]);
+ S.push(['rituals','Dark Ritual',[rb('Dark Ritual pre-battle action',`<ol><li>Before crews are chosen, seek the favour of ${D().key==='undivided'?'any Chaos power':esc(D().title)}.</li><li>Randomly pick one gang member (not the Leader) as the focus. You may Bleed the Captive and/or Defile a fighter.</li><li>Roll 2D6: +1 won last battle, +1 gained Rep, +1 Captive bled, +1 matching dedication, −1 lost Rep, −1 Leader in Recovery.</li><li><strong>Bleed the Captive:</strong> +1; the captive rolls a Lasting Injury of 50+D6, is placed within 12" of the centre; enemies within 1" can Free Captive (Simple) – pass Intelligence to capture, fail and the captive returns Humiliated.</li><li><strong>Defilement:</strong> a fighter in the crew starts with D3 Flesh Wounds; +1 per wound.</li><li><strong>9+:</strong> the chosen power's favour for one battle; the focus gains +D6 XP. <strong>4 or less:</strong> the focus becomes a Chaos Spawn.</li></ol>`),
+  ...(D().key==='undivided'?Object.keys(FAV):[D().fav]).map(k=>{const F2=FAV[k];return rb(`${F2.r} – ${esc(F2.god)}`,ul([`<strong>Blessing:</strong> ${esc(F2.b[0])}`,`<strong>Boon:</strong> ${esc(F2.b[1])}`,`<strong>Warped:</strong> ${esc(F2.b[2])}`]))})]]);
+ S.push(['injuries','Injuries & status',[rb('Lasting Injuries',`<p style="font-size:.9rem">After the battle, roll a D66 for each fighter taken Out of Action. Stat changes stack and are permanent.</p>`+tbl(['D66','Result','Effect'],LI.map(x=>`<tr><td class="c">${x.r}</td><td><strong>${x.n}</strong></td><td>${esc(x.t)}</td></tr>`)),true),
+  rb('Fighter status',ul(['<strong>Active:</strong> available for battles.','<strong>In Recovery:</strong> misses the next battle, then returns to Active.','<strong>Critical (needs a Doc):</strong> dies after the battle unless treated with a Medical Escort post-battle action.','<strong>Captured:</strong> held by another gang until rescued, ransomed or traded.','<strong>Dead:</strong> removed from play; no longer counts towards gang cost.'])),
+  rb('Chaos Cult exceptions',ul(['<strong>Amaranthine (Apostle):</strong> a Memorable Death passes to a random gang fighter as a Sacrifice; the Apostle takes Enfeebled and the Crooked Body Mutation. The Apostle can\u2019t be Captured.','<strong>Warp Denizen (Daemon):</strong> ignores all Lasting Injuries except Memorable Death.','<strong>Chaos Spawn:</strong> never suffers Lasting Injuries except Memorable Death.','<strong>Bleed the Captive:</strong> the captive rolls a Lasting Injury of 50+D6 (results 51–56).']))]]);
+ S.push(['subplots','Sub-plots',[rb('Using sub-plots',ul(['Agree before the battle. Each player privately draws one card from a deck of playing cards.','A Joker is shown and discarded; draw two cards instead (repeat for more Jokers).','On completion reveal it, take the reward, and discard the card permanently.'])),
+  ...Object.values(SP).map(s=>rb(`${s.sym} ${s.suit}: ${s.theme} <span class="pill">${s.reward}</span>`,tbl(['Card','Sub-plot','Condition and reward'],s.c.map((c,i)=>`<tr><td class="c">${RANKS[i]}</td><td><strong>${esc(c[0])}</strong></td><td>${esc(c[1])}</td></tr>`)),true))]]);
+ return S}
+const RBLURB={gang:'Founding, Chaos Cult rules, Brutes and Hangers-On',fighters:'Profiles, marks, skills and special rules',equipment:'Who can take what, limits and Rep',armoury:'Weapon profiles, armour and wargear',mutations:'The D66 Mutation table',wyrd:'The Aetheric Discipline',skills:'Skill access, Heresy and god skills',dedication:'Your god, its Mark and Daemon Rep',articles:'Delusion Dice and every Path of Damnation',rituals:'Dark Ritual and favours',injuries:'Lasting Injuries and fighter status',subplots:'The four suits of secret missions'};
+let RS=null;
+function renderRules(sub){RS=rulesSections();const sec=RS.find(x=>x[0]===sub);
+ if(sec){const i=RS.indexOf(sec),prev=RS[i-1],next=RS[i+1];
+  app.innerHTML=`<div class="codex"><nav class="toc" aria-label="Rules sections"><a href="#rules">← All rules</a>${RS.map(([id,t])=>`<a href="#rules-${id}" ${id===sub?'aria-current="page"':''}>${t}</a>`).join('')}</nav>
+  <div><p class="crumbs"><a href="#rules">Rules</a> / ${sec[1]}</p><section class="csec" id="sec-${sec[0]}" style="border:0"><h2>${sec[1]}</h2>${sec[2].join('')}</section>
+  <div class="row" style="justify-content:space-between">${prev?`<a class="btn" href="#rules-${prev[0]}">← ${prev[1]}</a>`:'<span></span>'}${next?`<a class="btn" href="#rules-${next[0]}">${next[1]} →</a>`:''}</div></div></div>`;return}
+ app.innerHTML=`<div class="stack" style="gap:16px"><div><h2>Rules</h2><p class="muted">${esc(D().title)} · ${PATHS[G.path].n}. Pick a section, or search everything.</p></div>
+ <input type="search" class="search" id="rules-q" placeholder="Search the rules – e.g. Frenzy, Scarce, Daemon" value="${esc(UI.rules||'')}" aria-label="Search rules">
+ <div id="rules-body"></div></div>`;rulesBody()}
+function rulesBody(){const b=document.getElementById('rules-body');if(!b)return;const q=(UI.rules||'').trim();
+ if(!q){b.innerHTML=`<div class="rtiles">${RS.map(([id,t])=>`<a class="rtile" href="#rules-${id}"><strong>${t}</strong><span>${RBLURB[id]||''}</span></a>`).join('')}</div>`;return}
+ b.innerHTML=RS.map(([id,t,blocks])=>`<section class="csec" id="sec-${id}"><h2><a href="#rules-${id}" style="color:inherit;text-decoration:none">${t} →</a></h2>${blocks.join('')}</section>`).join('')+'<p class="muted" id="noresults" hidden>Nothing matches that search.</p>';filterRules()}
+function filterRules(){const q=(UI.rules||'').trim().toLowerCase();let any=false;document.querySelectorAll('.csec').forEach(sec=>{let vis=false;
+ sec.querySelectorAll('.rb').forEach(b=>{let show=!q||b.textContent.toLowerCase().includes(q);
+  if(q&&show){b.querySelectorAll('tbody tr').forEach(tr=>tr.classList.toggle('hidden-by-search',!tr.textContent.toLowerCase().includes(q)&&!tr.classList.contains('grp')&&!b.querySelector('h3')?.textContent.toLowerCase().includes(q)))}else b.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('hidden-by-search'));
+  b.classList.toggle('hidden-by-search',!show);if(show)vis=true});sec.classList.toggle('hidden-by-search',!vis);if(vis)any=true});
+ const nr=document.getElementById('noresults');if(nr)nr.hidden=any}
+app.addEventListener('input',e=>{if(e.target.id==='rules-q'){UI.rules=e.target.value;saveUI();rulesBody()}});
+app.addEventListener('click',e=>{const a=e.target.closest('[data-jump]');if(!a)return;e.preventDefault();document.getElementById('sec-'+a.dataset.jump)?.scrollIntoView({behavior:'smooth',block:'start'})});
+
+/* Easter egg: Scrunt Nathan */
+const SCRUNT_LINES=['The Dark Gods sigh. Scrunt Nathan has crawled out from under a pipe.','Scrunt Nathan is here. Nobody asked.','Scrunt Nathan offers you a sharpened spoon. Decline it.','Scrunt Nathan apologises for existing.','Somewhere, Scrunt Nathan is losing a fight with a door.','Scrunt Nathan has been found. Again. Unfortunately.'];
+let scruntN=0;
+function unlockScrunt(){const first=!scruntOn();G.scrunt=true;save();LS.set('ss-scrunt',true);const h=document.querySelector('.brand h1');h.classList.remove('quake');void h.offsetWidth;h.classList.add('quake');setTimeout(()=>h.classList.remove('quake'),900);
+ toast(first?SCRUNT_LINES[0]:SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))]);route();
+ if((location.hash||'#build')==='#build'){UI.addSel='scrunt';saveUI();renderBuild();requestAnimationFrame(()=>{const b=document.querySelector('.recruit');if(b){b.scrollIntoView({block:'center',behavior:'smooth'});b.classList.add('quake');setTimeout(()=>b.classList.remove('quake'),900)}})}}
+(()=>{let n=0,t=0;document.querySelector('.brand h1').addEventListener('click',()=>{const now=Date.now();n=now-t<1500?n+1:1;t=now;if(n>=8){n=0;unlockScrunt()}})})();
+app.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.name&&/^\s*scrunt\s+nathan\s*$/i.test(e.target.value))unlockScrunt()});
+/* skill datalist */
+document.body.insertAdjacentHTML('beforeend',`<datalist id="skilllist">${ALLSKILLS.map(s=>`<option value="${esc(s[0])}">`).join('')}</datalist>`);
+route();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+
+</body>
+</html>
