@@ -1391,7 +1391,11 @@ app.addEventListener('click',e=>{const a=e.target.closest('[data-jump]');if(!a)r
 const SCRUNT_NAME='Scrunticus Maxicus Flathicus';
 const SCRUNT_LINES=['The Dark Gods sigh. Scrunticus Maxicus Flathicus has joined the gang.','Scrunticus Maxicus Flathicus is already here. Nobody asked.','Scrunticus Maxicus Flathicus offers you a sharpened spoon. Decline it.','Scrunticus Maxicus Flathicus apologises for existing.','Somewhere, Scrunticus Maxicus Flathicus is losing a fight with a door.','Scrunticus Maxicus Flathicus has been found. Again. Unfortunately.'];
 let scruntN=0;
-function recruitScrunt(){G.scrunt=true;LS.set('ss-scrunt',true);
+/* Sound clips played on the 8-click summon. Put audio files in the sounds/ folder and list them here, e.g. 'sounds/grovel.mp3'. One is picked at random each time. */
+const SCRUNT_SOUNDS=[];
+let scruntAudio=null;
+function playScruntSound(){if(!SCRUNT_SOUNDS.length)return;try{if(scruntAudio)scruntAudio.pause();scruntAudio=new Audio(SCRUNT_SOUNDS[Math.floor(Math.random()*SCRUNT_SOUNDS.length)]);scruntAudio.play().catch(()=>{})}catch(e){}}
+function recruitScrunt(){G.scrunt=true;LS.set('ss-scrunt',true);playScruntSound();
  const h=document.querySelector('.brand h1');h.classList.remove('quake');void h.offsetWidth;h.classList.add('quake');setTimeout(()=>h.classList.remove('quake'),900);
  let f=G.fighters.find(x=>x.type==='scrunt'&&cstat(x)!=='dead');
  if(f){toast(SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))])}

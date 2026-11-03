@@ -1,5 +1,5 @@
 // Offline cache for Skin and Sinew. Bump VERSION when you change any file.
-const VERSION = 'eightfold-path-v17';
+const VERSION = 'eightfold-path-v18';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
