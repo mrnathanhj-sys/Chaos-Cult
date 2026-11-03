@@ -197,7 +197,7 @@ textarea{width:100%;font-family:var(--mono);font-size:.78rem}
 .hidden-by-search{display:none!important}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:700;z-index:50;font-size:.9rem}
 @keyframes quake{0%,100%{transform:none}20%{transform:translate(-3px,1px) rotate(-2deg)}40%{transform:translate(3px,-1px) rotate(2deg)}60%{transform:translate(-2px,0) rotate(-1deg)}80%{transform:translate(2px,1px) rotate(1deg)}}
-.brand h1{cursor:default;user-select:none}.brand h1.quake,.recruit.quake{animation:quake .3s 3}
+.brand h1{cursor:default;user-select:none}.brand h1.quake,.recruit.quake,.fc.quake{animation:quake .3s 3}
 .fc.dead{opacity:.55}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:stretch}
 .pc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -262,7 +262,7 @@ acolyte:{n:'Acolyte',role:'Juve',cost:20,max:99,code:'J',st:[6,5,5,3,3,1,4,2,9,8
 ogryn:{n:'Corrupted Ogryn',role:'Brute',cost:210,max:1,code:'',st:[5,3,5,5,5,3,4,3,7,6,8,9],brute:1,mut:[0,2],P:['Brawn','Ferocity','Savagery'],S:['Combat','Mutation'],rules:['Juggernaut','Murderous Brute','Slow-Witted'],equip:'Two Open Fists by default. Options below.'},
 daemon:{n:'Daemon',role:'Brute',cost:250,max:1,code:'',st:[6,3,4,4,4,3,4,3,9,4,6,7],mark:1,brute:1,rep:8,mut:[0,0],P:['Combat','Ferocity','Savagery'],S:['Brawn','Mutation'],rules:['Immaterial Member','Juggernaut','Terrifying','Incorporeal','Instability','Warp Denizen','Manifestation of Chaos','Mark of Chaos'],equip:'Vorpal Claws and Warpfire Breath.'},
 };
-FT.scrunt={n:'Scrunt Nathan',role:'Wretch',cost:1,max:1,code:'',st:[3,6,6,1,1,1,6,1,12,12,12,12],mut:[0,0],P:['Nothing'],S:['Nothing'],rules:['Snivelling Coward','Beneath Contempt','Grovel','Scrunt Happens','Faithless','Ritual Fodder','Absolutely Not a Chaos Spawn'],equip:'Armed with a Sharpened Spoon. Cannot be given any other weapons or equipment; he drops them.',secret:1};
+FT.scrunt={n:'Scrunticus Maxicus Flathicus',role:'Wretch',cost:1,max:1,code:'',st:[3,6,6,1,1,1,6,1,12,12,12,12],mut:[0,0],P:['Nothing'],S:['Nothing'],rules:['Snivelling Coward','Beneath Contempt','Grovel','Scrunt Happens','Faithless','Ritual Fodder','Absolutely Not a Chaos Spawn'],equip:'Armed with a Sharpened Spoon. Cannot be given any other weapons or equipment; he drops them.',secret:1};
 const ALLORDER=['apostle','disciple','sorcerer','mutantlord','mutant','chosen','cultist','acolyte','ogryn','daemon','scrunt'];
 const scruntOn=()=>!!(G.scrunt||LS.get('ss-scrunt',false));
 const ORDERF=()=>ALLORDER.filter(t=>t!=='scrunt'||scruntOn());
@@ -1385,14 +1385,19 @@ function filterRules(){const q=(UI.rules||'').trim().toLowerCase();let any=false
 app.addEventListener('input',e=>{if(e.target.id==='rules-q'){UI.rules=e.target.value;saveUI();rulesBody()}});
 app.addEventListener('click',e=>{const a=e.target.closest('[data-jump]');if(!a)return;e.preventDefault();document.getElementById('sec-'+a.dataset.jump)?.scrollIntoView({behavior:'smooth',block:'start'})});
 
-/* Easter egg: Scrunt Nathan */
-const SCRUNT_LINES=['The Dark Gods sigh. Scrunt Nathan has crawled out from under a pipe.','Scrunt Nathan is here. Nobody asked.','Scrunt Nathan offers you a sharpened spoon. Decline it.','Scrunt Nathan apologises for existing.','Somewhere, Scrunt Nathan is losing a fight with a door.','Scrunt Nathan has been found. Again. Unfortunately.'];
+/* Easter egg: click the "Eightfold Path" title 8 times to recruit Scrunticus Maxicus Flathicus */
+const SCRUNT_NAME='Scrunticus Maxicus Flathicus';
+const SCRUNT_LINES=['The Dark Gods sigh. Scrunticus Maxicus Flathicus has joined the gang.','Scrunticus Maxicus Flathicus is already here. Nobody asked.','Scrunticus Maxicus Flathicus offers you a sharpened spoon. Decline it.','Scrunticus Maxicus Flathicus apologises for existing.','Somewhere, Scrunticus Maxicus Flathicus is losing a fight with a door.','Scrunticus Maxicus Flathicus has been found. Again. Unfortunately.'];
 let scruntN=0;
-function unlockScrunt(){const first=!scruntOn();G.scrunt=true;save();LS.set('ss-scrunt',true);const h=document.querySelector('.brand h1');h.classList.remove('quake');void h.offsetWidth;h.classList.add('quake');setTimeout(()=>h.classList.remove('quake'),900);
- toast(first?SCRUNT_LINES[0]:SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))]);route();
- if((location.hash||'#build')==='#build'){UI.addSel='scrunt';saveUI();renderBuild();requestAnimationFrame(()=>{const b=document.querySelector('.recruit');if(b){b.scrollIntoView({block:'center',behavior:'smooth'});b.classList.add('quake');setTimeout(()=>b.classList.remove('quake'),900)}})}}
-(()=>{let n=0,t=0;document.querySelector('.brand h1').addEventListener('click',()=>{const now=Date.now();n=now-t<1500?n+1:1;t=now;if(n>=8){n=0;unlockScrunt()}})})();
-app.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.name&&/^\s*scrunt\s+nathan\s*$/i.test(e.target.value))unlockScrunt()});
+function recruitScrunt(){G.scrunt=true;LS.set('ss-scrunt',true);
+ const h=document.querySelector('.brand h1');h.classList.remove('quake');void h.offsetWidth;h.classList.add('quake');setTimeout(()=>h.classList.remove('quake'),900);
+ let f=G.fighters.find(x=>x.type==='scrunt'&&cstat(x)!=='dead');
+ if(f){toast(SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))])}
+ else{f=F('scrunt',SCRUNT_NAME,[],[],{open:true});G.fighters.forEach(x=>x.open=false);G.fighters.push(f);G.example=false;toast(SCRUNT_LINES[0])}
+ save();UI.scrollTo=f.uid;saveUI();
+ if((location.hash||'#build')==='#build')route();else location.hash='#build';
+ requestAnimationFrame(()=>{const c=document.querySelector(`[data-uid="${f.uid}"]`);if(c){c.classList.add('quake');setTimeout(()=>c.classList.remove('quake'),900)}})}
+(()=>{let n=0,t=0;document.querySelector('.brand h1').addEventListener('click',()=>{const now=Date.now();n=now-t<1500?n+1:1;t=now;if(n>=8){n=0;recruitScrunt()}})})();
 /* skill datalist */
 document.body.insertAdjacentHTML('beforeend',`<datalist id="skilllist">${ALLSKILLS.map(s=>`<option value="${esc(s[0])}">`).join('')}</datalist>`);
 route();
