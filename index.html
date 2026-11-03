@@ -907,7 +907,7 @@ const save=()=>{LS.set('ss-gang',G)},saveB=()=>LS.set('ss-battle',B),saveD=()=>L
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const d6=()=>1+Math.floor(Math.random()*6);
 const fmt=(k,v)=>k==='M'?v+'"':TN.has(k)?v+'+':String(v);
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,1800)}
+function toast(m,ms=1800){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,ms)}
 function stats(f){const T=FT[f.type];const o={};STATK.forEach((k,i)=>o[k]=T.st[i]);
  if(T.mark){Object.entries(markMods(f)).forEach(([k,v])=>{o[k]+=v})}
  (f.injuries||[]).forEach(n=>{const L=LIP[n];if(L)Object.entries(L.mods).forEach(([k,v])=>{o[k]+=v})});
@@ -1398,8 +1398,8 @@ function playScruntSound(){if(!SCRUNT_SOUNDS.length)return;try{if(scruntAudio)sc
 function recruitScrunt(){G.scrunt=true;LS.set('ss-scrunt',true);playScruntSound();
  const h=document.querySelector('.brand h1');h.classList.remove('quake');void h.offsetWidth;h.classList.add('quake');setTimeout(()=>h.classList.remove('quake'),900);
  let f=G.fighters.find(x=>x.type==='scrunt'&&cstat(x)!=='dead');
- if(f){toast(SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))])}
- else{f=F('scrunt',SCRUNT_NAME,[],[],{open:true});G.fighters.forEach(x=>x.open=false);G.fighters.push(f);G.example=false;toast(SCRUNT_LINES[0])}
+ if(f){toast(SCRUNT_LINES[1+(scruntN++%(SCRUNT_LINES.length-1))],5000)}
+ else{f=F('scrunt',SCRUNT_NAME,[],[],{open:true});G.fighters.forEach(x=>x.open=false);G.fighters.push(f);G.example=false;toast(SCRUNT_LINES[0],5000)}
  save();UI.scrollTo=f.uid;saveUI();
  if((location.hash||'#build')==='#build')route();else location.hash='#build';
  requestAnimationFrame(()=>{const c=document.querySelector(`[data-uid="${f.uid}"]`);if(c){c.classList.add('quake');setTimeout(()=>c.classList.remove('quake'),900)}})}
